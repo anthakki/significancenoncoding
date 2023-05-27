@@ -369,7 +369,7 @@ public class Combine_PValues_FDR {
 				coverage_n[i]=new double[1+(chr_length[i]-shift_mut)/10000];
 			}
 			
-			FileInputStream in=new FileInputStream(file_coverage+shift_mut+".txt");//TODO: adapt file OK
+			java.io.InputStream in=ZipOverlay.fileInputStream(file_coverage+shift_mut+".txt");//TODO: adapt file OK
 			DataInputStream inn=new DataInputStream(in);
 			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 			
@@ -586,7 +586,7 @@ public class Combine_PValues_FDR {
 	//read list of official gene symbols and initizalize look up tables to assign gene names to their official symbols
 	public static void read_symbol_list(){
 		try{
-			FileInputStream in=new FileInputStream(file_symbols);
+			java.io.InputStream in=ZipOverlay.fileInputStream(file_symbols);
 			DataInputStream inn=new DataInputStream(in);
 			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 			input.readLine();
@@ -651,7 +651,7 @@ public class Combine_PValues_FDR {
 		try{
 			for (int i=0;i<chr.length;i++){
 				
-				FileInputStream in=new FileInputStream(file_genes+chr[i]+"_Hg19.bed");
+				java.io.InputStream in=ZipOverlay.fileInputStream(file_genes+chr[i]+"_Hg19.bed");
 				DataInputStream inn=new DataInputStream(in);
 				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 				String s="";
@@ -873,7 +873,7 @@ public class Combine_PValues_FDR {
 		try{
 			Hashtable<String,String> conversion_mir=new Hashtable<String,String>();
 			String s="";
-			FileInputStream in=new FileInputStream(file_transform_mir);
+			java.io.InputStream in=ZipOverlay.fileInputStream(file_transform_mir);
 			DataInputStream inn=new DataInputStream(in);
 			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 			while((s=input.readLine())!=null){
@@ -883,12 +883,12 @@ public class Combine_PValues_FDR {
 			input.close();
 				
 			for (int k=0;k<entity2.length;k++){//path_expression.size()
-				if(!new File(file_expression+entity2[k]+".txt").exists()){
+				if(!ZipOverlay.exists(new File(file_expression+entity2[k]+".txt"))){
 					continue;
 				}
 				
-				in=new FileInputStream(file_expression+entity2[k]+".txt");//path_expression.get(k)
-				inn=new DataInputStream(in);
+				{ java.io.InputStream in1=ZipOverlay.fileInputStream(file_expression+entity2[k]+".txt");//path_expression.get(k)
+				inn=new DataInputStream(in1); }
 				input= new BufferedReader(new InputStreamReader(inn));
 				input.readLine();
 				input.readLine();
@@ -927,12 +927,12 @@ public class Combine_PValues_FDR {
 			}
 			
 			for (int k=0;k<entity2.length;k++){//path_mir_expression.size()
-				if(!new File(file_expression+entity2[k]+"_mir.txt").exists()){
+				if(!ZipOverlay.exists(new File(file_expression+entity2[k]+"_mir.txt"))){
 					continue;
 				}
 				
-				in=new FileInputStream(file_expression+entity2[k]+"_mir.txt");//path_mir_expression.get(k)
-				inn=new DataInputStream(in);
+				{ java.io.InputStream in1=ZipOverlay.fileInputStream(file_expression+entity2[k]+"_mir.txt");//path_mir_expression.get(k)
+				inn=new DataInputStream(in1); }
 				input= new BufferedReader(new InputStreamReader(inn));
 				input.readLine();
 				input.readLine();

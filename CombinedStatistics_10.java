@@ -1455,7 +1455,7 @@ public class CombinedStatistics_10 {
 		try{
 			for (int chr_index=0;chr_index<chr.length;chr_index++){
 				chromatin_1000[chr_index]=new double[1+(chr_length[chr_index]-shift_mut)/1000][4];
-				FileInputStream in=new FileInputStream(file_epi_signal_1000+chr[chr_index]+"_"+shift_mut+".txt");
+				java.io.InputStream in=ZipOverlay.fileInputStream(file_epi_signal_1000+chr[chr_index]+"_"+shift_mut+".txt");
 				DataInputStream inn=new DataInputStream(in);
 				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 				input.readLine();
@@ -1495,7 +1495,7 @@ public class CombinedStatistics_10 {
 			for (int chr_index=0;chr_index<chr.length;chr_index++){
 				
 				chromatin_10000[chr_index]=new double[1+(chr_length[chr_index]-shift_mut)/10000][4];
-				FileInputStream in=new FileInputStream(file_epi_signal_10000+chr[chr_index]+"_"+shift_mut+".txt");
+				java.io.InputStream in=ZipOverlay.fileInputStream(file_epi_signal_10000+chr[chr_index]+"_"+shift_mut+".txt");
 				DataInputStream inn=new DataInputStream(in);
 				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 				input.readLine();
@@ -1605,7 +1605,7 @@ public class CombinedStatistics_10 {
 		}
 		
 		initiate( entity_sel,  shift_mut,  folder_auxiliary,  folder_significance, folder_annotation, folder_counts_all,  all_entities,files_donors, files_mut_snv, files_mut_indel);
-		if(!new File(folder_annotation).exists()){
+		if(!ZipOverlay.exists(new File(folder_annotation))){
 			return;
 		}
 		if(!new File(folder_auxiliary).exists()){
@@ -2526,7 +2526,7 @@ public class CombinedStatistics_10 {
 			//From Destructive Component
 			
 			ArrayList<int[]> exons=new ArrayList<int[]>();
-			FileInputStream in=new FileInputStream(file_exons);
+			java.io.InputStream in=ZipOverlay.fileInputStream(file_exons);
 			DataInputStream inn=new DataInputStream(in);
 			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 			String s="";
@@ -2556,8 +2556,8 @@ public class CombinedStatistics_10 {
 				Hashtable<Integer,Integer> table_positions=new Hashtable<Integer,Integer>();
 				ArrayList<Position> positions=new ArrayList<Position>();
 			
-				in=new FileInputStream(file_as_annotation+chr[i]+".txt");
-				inn=new DataInputStream(in);
+				{ java.io.InputStream in1=ZipOverlay.fileInputStream(file_as_annotation+chr[i]+".txt");
+				inn=new DataInputStream(in1); }
 				input= new BufferedReader(new InputStreamReader(inn));
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
@@ -4410,7 +4410,7 @@ public class CombinedStatistics_10 {
 				coverage_n[i]=new double[1+(chr_length[i]-shift_mut)/10000];
 			}
 			
-			FileInputStream in=new FileInputStream(file_coverage);
+			java.io.InputStream in=ZipOverlay.fileInputStream(file_coverage);
 			DataInputStream inn=new DataInputStream(in);
 			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 			
@@ -4568,7 +4568,7 @@ public class CombinedStatistics_10 {
 				}
 				
 				if(entities.equals("Liver")){
-					FileInputStream in=new FileInputStream(file_exclude_regions_liver);
+					java.io.InputStream in=ZipOverlay.fileInputStream(file_exclude_regions_liver);
 					DataInputStream inn=new DataInputStream(in);
 					BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 					String s="";
@@ -4581,7 +4581,7 @@ public class CombinedStatistics_10 {
 					input.close();
 				}
 				else{
-					FileInputStream in=new FileInputStream(file_exclude_regions_non_liver);
+					java.io.InputStream in=ZipOverlay.fileInputStream(file_exclude_regions_non_liver);
 					DataInputStream inn=new DataInputStream(in);
 					BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 					String s="";
@@ -4779,7 +4779,7 @@ public class CombinedStatistics_10 {
 					}
 				}
 				
-				FileInputStream in=new FileInputStream(file_exclude_regions_non_liver);
+				java.io.InputStream in=ZipOverlay.fileInputStream(file_exclude_regions_non_liver);
 				DataInputStream inn=new DataInputStream(in);
 				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 				String s="";
@@ -5147,7 +5147,7 @@ public class CombinedStatistics_10 {
 				}
 				
 				for (int j=0;j<1+(chr_length[chr_index]-shift_mut)/1000000;j++){
-					FileInputStream in=new FileInputStream(file_dichotomous+chr[chr_index]+"_"+j+".txt");
+					java.io.InputStream in=ZipOverlay.fileInputStream(file_dichotomous+chr[chr_index]+"_"+j+".txt");
 					DataInputStream inn=new DataInputStream(in);
 					BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 					String s="";
@@ -5275,7 +5275,7 @@ public class CombinedStatistics_10 {
 			status=1;
 			try{
 				for (int j=0;j<1+(chr_length[chr_index]-shift_mut)/1000000;j++){
-					FileInputStream in=new FileInputStream(file_dichotomous+chr[chr_index]+"_"+j+".txt");
+					java.io.InputStream in=ZipOverlay.fileInputStream(file_dichotomous+chr[chr_index]+"_"+j+".txt");
 					DataInputStream inn=new DataInputStream(in);
 					BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 					String s="";
@@ -5359,7 +5359,7 @@ public class CombinedStatistics_10 {
 			status=1;
 			try{
 				Hashtable<Integer,Integer> table_code=new Hashtable<Integer,Integer>();
-				FileInputStream in=new FileInputStream(file_as_annotation+chr[chr_index]+".txt");
+				java.io.InputStream in=ZipOverlay.fileInputStream(file_as_annotation+chr[chr_index]+".txt");
 				DataInputStream inn=new DataInputStream(in);
 				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 				input.readLine();
@@ -5449,7 +5449,7 @@ public class CombinedStatistics_10 {
 				int prev=-1;
 				int start=-1;
 				Hashtable<Integer,Integer> table_coding=new Hashtable<Integer,Integer>();
-				FileInputStream in=new FileInputStream(file_as_annotation+chr[chr_index]+".txt");
+				java.io.InputStream in=ZipOverlay.fileInputStream(file_as_annotation+chr[chr_index]+".txt");
 				DataInputStream inn=new DataInputStream(in);
 				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 				input.readLine();
@@ -5674,8 +5674,8 @@ public class CombinedStatistics_10 {
 			try{
 				for (int j=0;j<chr_length[i]/1000000;j++){
 					Hashtable<String,double[]> table=new Hashtable<String,double[]>();
-					if(new File(file_splice_ai+chr[i]+"_"+(j+1)+".txt").exists()){
-						FileInputStream in=new FileInputStream(file_splice_ai+chr[i]+"_"+(j+1)+".txt");
+					if(ZipOverlay.exists(new File(file_splice_ai+chr[i]+"_"+(j+1)+".txt"))){
+						java.io.InputStream in=ZipOverlay.fileInputStream(file_splice_ai+chr[i]+"_"+(j+1)+".txt");
 						DataInputStream inn=new DataInputStream(in);
 						BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 						String s="";
@@ -5791,7 +5791,7 @@ public class CombinedStatistics_10 {
 	public static ArrayList<char[]> read_genome(String c){
 		ArrayList<char[]> genome=new ArrayList<char[]>();
 		try{
-			FileInputStream in=new FileInputStream(file_genome+c+".fa");//chr[i]
+			java.io.InputStream in=ZipOverlay.fileInputStream(file_genome+c+".fa");//chr[i]
 			DataInputStream inn=new DataInputStream(in);
 			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
 			input.readLine();

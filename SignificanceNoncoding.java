@@ -87,7 +87,7 @@ public class SignificanceNoncoding {
 		}
 		
 		
-		if(!new File(folder_annotation).exists()){
+		if(!ZipOverlay.exists(new File(folder_annotation))){
 			System.out.println(folder_annotation+" does not exist");
 			return;
 		}
