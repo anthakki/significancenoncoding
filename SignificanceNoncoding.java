@@ -24,7 +24,6 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -38,6 +37,7 @@ public class SignificanceNoncoding {
 	static String[] chr={"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","X","Y"};//,,"Y"
 	static String[] chr2={"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24"};//,,"Y"
 	static String separator="/";
+	static String out_suffix="";
 	
 	//parse arguments of the method and decide whether annotation files need to be downloaded
 	public static void main(String[] args){
@@ -47,6 +47,13 @@ public class SignificanceNoncoding {
 			if(!args[i].equals("")){
 				if(args[i].equals("-k")){
 					delete_intermediate=false;
+				}
+				else if(args[i].startsWith("-z")){
+					String level=args[i].substring("-z".length());
+					if (!level.equals("")){
+						ZipFilter.gzip_level=Integer.parseInt(level);
+					}
+					out_suffix=".gz";
 				}
 				else{
 					arg.add(args[i]);	
@@ -113,8 +120,7 @@ public class SignificanceNoncoding {
 			ArrayList<String> entities=new ArrayList<String>();
 			ArrayList<ArrayList<String>> files=new ArrayList<ArrayList<String>>();
 			FileInputStream in=new FileInputStream(file_list_mutation_files);
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String s="";
 			while((s=input.readLine())!=null){
 				String[] t=s.split("	");
@@ -136,35 +142,33 @@ public class SignificanceNoncoding {
 			for (int i=0;i<files.size();i++){
 				System.out.println(files.get(i));
 				
-				FileWriter[][] out=new FileWriter[chr.length][2];
 				BufferedWriter[][] output= new BufferedWriter[chr.length][2];
 				ArrayList<String> donors=new ArrayList<String>();
 				for (int ii=0;ii<chr.length;ii++){
 					for (int jj=0;jj<2;jj++){
 						if(jj==0){
-							String file=folder_auxiliary+"MutationFiles"+separator+"Mutations_Chr"+chr[ii]+"_"+entities.get(i)+"_SNV.txt";
+							String file=folder_auxiliary+"MutationFiles"+separator+"Mutations_Chr"+chr[ii]+"_"+entities.get(i)+"_SNV.txt"+out_suffix;
 							files_mut_snv[i][ii][0]=file;
-							out[ii][jj]=new FileWriter(file);
-							output[ii][jj]= new BufferedWriter(out[ii][jj]);
+							java.io.FileOutputStream out=new java.io.FileOutputStream(file);
+							output[ii][jj]= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file)));
 							
 						}
 						else{
-							String file=folder_auxiliary+"MutationFiles"+separator+"Mutations_Chr"+chr[ii]+"_"+entities.get(i)+"_Indel.txt";
+							String file=folder_auxiliary+"MutationFiles"+separator+"Mutations_Chr"+chr[ii]+"_"+entities.get(i)+"_Indel.txt"+out_suffix;
 							files_mut_indel[i][ii][0]=file;
-							out[ii][jj]=new FileWriter(file);
-							output[ii][jj]= new BufferedWriter(out[ii][jj]);
+							java.io.FileOutputStream out=new java.io.FileOutputStream(file);
+							output[ii][jj]= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file)));
 						}
 					}
 				}
 				
-				files_donors[i][0]=folder_auxiliary+"MutationFiles"+separator+"Donors_"+entities.get(i)+".txt";
-				FileWriter out_donor=new FileWriter(files_donors[i][0]);
-				BufferedWriter output_donor= new BufferedWriter(out_donor);
+				files_donors[i][0]=folder_auxiliary+"MutationFiles"+separator+"Donors_"+entities.get(i)+".txt"+out_suffix;
+				java.io.FileOutputStream out_donor=new java.io.FileOutputStream(files_donors[i][0]);
+				BufferedWriter output_donor= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out_donor, files_donors[i][0])));
 		
 				for (int j=0;j<files.get(i).size();j++){
 					in=new FileInputStream(files.get(i).get(j));
-					inn=new DataInputStream(in);
-					input= new BufferedReader(new InputStreamReader(inn));
+					input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 					String[] header=input.readLine().split("	");
 					
 					int index_chr=index("Chromosome",header);

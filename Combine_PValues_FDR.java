@@ -234,8 +234,9 @@ public class Combine_PValues_FDR {
 				int shift=0;
 				int width=2500;
 				ArrayList<Integer>[][] index_gene=index_gene(shift, width);
-				FileWriter out=new FileWriter(folder_auxiliary+"FDR_Weighted_Combined_"+entity+".txt");
-				BufferedWriter output= new BufferedWriter(out);
+				String out_fn=folder_auxiliary+"FDR_Weighted_Combined_"+entity+".txt"+SignificanceNoncoding.out_suffix;
+				java.io.FileOutputStream out=new java.io.FileOutputStream(out_fn);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, out_fn)));
 				for (int i=0;i<fdr_weight_combine.length;i++){
 					for (int j=0;j<fdr_weight_combine[i].length;j++){
 						if(fdr_weight_combine[i][j]<0.1){
@@ -370,8 +371,7 @@ public class Combine_PValues_FDR {
 			}
 			
 			java.io.InputStream in=ZipOverlay.fileInputStream(file_coverage+shift_mut+".txt");//TODO: adapt file OK
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			
 			String s="";
 			while((s=input.readLine())!=null){
@@ -587,8 +587,7 @@ public class Combine_PValues_FDR {
 	public static void read_symbol_list(){
 		try{
 			java.io.InputStream in=ZipOverlay.fileInputStream(file_symbols);
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			input.readLine();
 			int n=0;
 			String s="";
@@ -652,8 +651,7 @@ public class Combine_PValues_FDR {
 			for (int i=0;i<chr.length;i++){
 				
 				java.io.InputStream in=ZipOverlay.fileInputStream(file_genes+chr[i]+"_Hg19.bed");
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String s="";
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
@@ -874,8 +872,7 @@ public class Combine_PValues_FDR {
 			Hashtable<String,String> conversion_mir=new Hashtable<String,String>();
 			String s="";
 			java.io.InputStream in=ZipOverlay.fileInputStream(file_transform_mir);
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			while((s=input.readLine())!=null){
 				String[] t=s.split("	");
 				conversion_mir.put(t[0],t[1]);
@@ -888,8 +885,7 @@ public class Combine_PValues_FDR {
 				}
 				
 				{ java.io.InputStream in1=ZipOverlay.fileInputStream(file_expression+entity2[k]+".txt");//path_expression.get(k)
-				inn=new DataInputStream(in1); }
-				input= new BufferedReader(new InputStreamReader(inn));
+				input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in1))); }
 				input.readLine();
 				input.readLine();
 				while((s=input.readLine())!=null){
@@ -932,8 +928,7 @@ public class Combine_PValues_FDR {
 				}
 				
 				{ java.io.InputStream in1=ZipOverlay.fileInputStream(file_expression+entity2[k]+"_mir.txt");//path_mir_expression.get(k)
-				inn=new DataInputStream(in1); }
-				input= new BufferedReader(new InputStreamReader(inn));
+				input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in1))); }
 				input.readLine();
 				input.readLine();
 				while((s=input.readLine())!=null){
@@ -1414,19 +1409,19 @@ public class Combine_PValues_FDR {
 	public static double[][] read_sign(String entity, int shift){
 		try{
 			String[] files_clumps={
-					folder_auxiliary+entity+"_10kb_"+shift+separator+"ClumpsCountCombi.txt",
-					folder_auxiliary+entity+"_10kb_"+shift+separator+"ClumpsCountCombiIndel.txt"
+					folder_auxiliary+entity+"_10kb_"+shift+separator+"ClumpsCountCombi.txt"+SignificanceNoncoding.out_suffix,
+					folder_auxiliary+entity+"_10kb_"+shift+separator+"ClumpsCountCombiIndel.txt"+SignificanceNoncoding.out_suffix
 			};
 			
 			String[] files_count={
-					folder_auxiliary+entity+"_10kb_"+shift+separator+"CountIndel1.txt",//p_indel_min	
-					folder_auxiliary+entity+"_10kb_"+shift+separator+"CountIndel2.txt",//p_indel_large	
-					folder_auxiliary+entity+"_10kb_"+shift+separator+"CountCombi1.txt",//p_combi_min	
-					folder_auxiliary+entity+"_10kb_"+shift+separator+"CountCombi2.txt",//p_combi_large	
-					folder_auxiliary+entity+"_10kb_"+shift+separator+"EpigenomicIndel1.txt",//sign_epigenomic_indel_large	
-					folder_auxiliary+entity+"_10kb_"+shift+separator+"EpigenomicIndel2.txt",//sign_epigenomic_indel_min	
-					folder_auxiliary+entity+"_10kb_"+shift+separator+"EpigenomicCombi1.txt",//sign_epigenomic_combi_large	
-					folder_auxiliary+entity+"_10kb_"+shift+separator+"EpigenomicCombi2.txt",//sign_epigenomic_combi_min
+					folder_auxiliary+entity+"_10kb_"+shift+separator+"CountIndel1.txt"+SignificanceNoncoding.out_suffix,//p_indel_min	
+					folder_auxiliary+entity+"_10kb_"+shift+separator+"CountIndel2.txt"+SignificanceNoncoding.out_suffix,//p_indel_large	
+					folder_auxiliary+entity+"_10kb_"+shift+separator+"CountCombi1.txt"+SignificanceNoncoding.out_suffix,//p_combi_min	
+					folder_auxiliary+entity+"_10kb_"+shift+separator+"CountCombi2.txt"+SignificanceNoncoding.out_suffix,//p_combi_large	
+					folder_auxiliary+entity+"_10kb_"+shift+separator+"EpigenomicIndel1.txt"+SignificanceNoncoding.out_suffix,//sign_epigenomic_indel_large	
+					folder_auxiliary+entity+"_10kb_"+shift+separator+"EpigenomicIndel2.txt"+SignificanceNoncoding.out_suffix,//sign_epigenomic_indel_min	
+					folder_auxiliary+entity+"_10kb_"+shift+separator+"EpigenomicCombi1.txt"+SignificanceNoncoding.out_suffix,//sign_epigenomic_combi_large	
+					folder_auxiliary+entity+"_10kb_"+shift+separator+"EpigenomicCombi2.txt"+SignificanceNoncoding.out_suffix,//sign_epigenomic_combi_min
 			
 			};
 			
@@ -1479,8 +1474,7 @@ public class Combine_PValues_FDR {
 			
 			for (int k=0;k<files_clumps.length;k++){
 				FileInputStream in=new FileInputStream(files_clumps[k]);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String s="";
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
@@ -1490,9 +1484,8 @@ public class Combine_PValues_FDR {
 				input.close();
 			}
 			
-			FileInputStream in=new FileInputStream(folder_significance+"Significance_"+entity+"_"+shift+".txt");
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			FileInputStream in=new FileInputStream(folder_significance+"Significance_"+entity+"_"+shift+".txt"+SignificanceNoncoding.out_suffix);
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			input.readLine();
 			String s="";
 			while((s=input.readLine())!=null){
@@ -1705,8 +1698,8 @@ public class Combine_PValues_FDR {
 	public static double[][] read_sign_100(String entity, int shift){
 		try{
 			String[] files_clumps={
-					folder_auxiliary+entity+"_100kb_"+shift+separator+"ClumpsCountCombi_100.txt",
-					folder_auxiliary+entity+"_100kb_"+shift+separator+"ClumpsCountCombiIndel_100.txt"
+					folder_auxiliary+entity+"_100kb_"+shift+separator+"ClumpsCountCombi_100.txt"+SignificanceNoncoding.out_suffix,
+					folder_auxiliary+entity+"_100kb_"+shift+separator+"ClumpsCountCombiIndel_100.txt"+SignificanceNoncoding.out_suffix
 			};
 					
 			
@@ -1714,18 +1707,18 @@ public class Combine_PValues_FDR {
 			
 			
 			String[] files_count_100={
-					folder_auxiliary+entity+"_100kb_"+shift+separator+"CountIndel1_100.txt",//p_indel_min_10fold	
-					folder_auxiliary+entity+"_100kb_"+shift+separator+"CountIndel3_100.txt",//p_indel_min_100fold	
-					folder_auxiliary+entity+"_100kb_"+shift+separator+"CountIndel2_100.txt",//p_indel_large	
-					folder_auxiliary+entity+"_100kb_"+shift+separator+"CountCombi1_100.txt",//p_combi_min_10fold	
-					folder_auxiliary+entity+"_100kb_"+shift+separator+"CountCombi3_100.txt",//p_combi_min_100fold	
-					folder_auxiliary+entity+"_100kb_"+shift+separator+"CountCombi2_100.txt",//p_combi_large	
-					folder_auxiliary+entity+"_100kb_"+shift+separator+"EpigenomicCombi1_100.txt",//sign_epigenomic_combi_large	
-					folder_auxiliary+entity+"_100kb_"+shift+separator+"EpigenomicCombi2_100.txt",//sign_epigenomic_combi_10fold	
-					folder_auxiliary+entity+"_100kb_"+shift+separator+"EpigenomicCombi3_100.txt",//sign_epigenomic_combi_100fold	
-					folder_auxiliary+entity+"_100kb_"+shift+separator+"EpigenomicIndel1_100.txt",//sign_epigenomic_indel_large	
-					folder_auxiliary+entity+"_100kb_"+shift+separator+"EpigenomicIndel2_100.txt",//sign_epigenomic_indel_10fold	
-					folder_auxiliary+entity+"_100kb_"+shift+separator+"EpigenomicIndel3_100.txt",//sign_epigenomic_indel_100fold	
+					folder_auxiliary+entity+"_100kb_"+shift+separator+"CountIndel1_100.txt"+SignificanceNoncoding.out_suffix,//p_indel_min_10fold	
+					folder_auxiliary+entity+"_100kb_"+shift+separator+"CountIndel3_100.txt"+SignificanceNoncoding.out_suffix,//p_indel_min_100fold	
+					folder_auxiliary+entity+"_100kb_"+shift+separator+"CountIndel2_100.txt"+SignificanceNoncoding.out_suffix,//p_indel_large	
+					folder_auxiliary+entity+"_100kb_"+shift+separator+"CountCombi1_100.txt"+SignificanceNoncoding.out_suffix,//p_combi_min_10fold	
+					folder_auxiliary+entity+"_100kb_"+shift+separator+"CountCombi3_100.txt"+SignificanceNoncoding.out_suffix,//p_combi_min_100fold	
+					folder_auxiliary+entity+"_100kb_"+shift+separator+"CountCombi2_100.txt"+SignificanceNoncoding.out_suffix,//p_combi_large	
+					folder_auxiliary+entity+"_100kb_"+shift+separator+"EpigenomicCombi1_100.txt"+SignificanceNoncoding.out_suffix,//sign_epigenomic_combi_large	
+					folder_auxiliary+entity+"_100kb_"+shift+separator+"EpigenomicCombi2_100.txt"+SignificanceNoncoding.out_suffix,//sign_epigenomic_combi_10fold	
+					folder_auxiliary+entity+"_100kb_"+shift+separator+"EpigenomicCombi3_100.txt"+SignificanceNoncoding.out_suffix,//sign_epigenomic_combi_100fold	
+					folder_auxiliary+entity+"_100kb_"+shift+separator+"EpigenomicIndel1_100.txt"+SignificanceNoncoding.out_suffix,//sign_epigenomic_indel_large	
+					folder_auxiliary+entity+"_100kb_"+shift+separator+"EpigenomicIndel2_100.txt"+SignificanceNoncoding.out_suffix,//sign_epigenomic_indel_10fold	
+					folder_auxiliary+entity+"_100kb_"+shift+separator+"EpigenomicIndel3_100.txt"+SignificanceNoncoding.out_suffix,//sign_epigenomic_indel_100fold	
 			};
 			
 			int[] files_count_100_dim={
@@ -1789,8 +1782,7 @@ public class Combine_PValues_FDR {
 			
 			for (int k=0;k<files_clumps.length;k++){
 				FileInputStream in=new FileInputStream(files_clumps[k]);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String s="";
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
@@ -1800,9 +1792,8 @@ public class Combine_PValues_FDR {
 				input.close();
 			}
 			
-			FileInputStream in=new FileInputStream(folder_significance+"Significance_100_"+entity+"_"+shift+".txt");
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			FileInputStream in=new FileInputStream(folder_significance+"Significance_100_"+entity+"_"+shift+".txt"+SignificanceNoncoding.out_suffix);
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			input.readLine();
 			String s="";
 			while((s=input.readLine())!=null){
@@ -1969,8 +1960,7 @@ public class Combine_PValues_FDR {
 		}
 		try{
 			FileInputStream in=new FileInputStream(file);
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String s="";
 			while((s=input.readLine())!=null){
 				String[] t=s.split("	");
@@ -1994,8 +1984,7 @@ public class Combine_PValues_FDR {
 		}
 		try{
 			FileInputStream in=new FileInputStream(file);
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String s="";
 			while((s=input.readLine())!=null){
 				String[] t=s.split("	");
@@ -2017,8 +2006,7 @@ public class Combine_PValues_FDR {
 		}
 		try{
 			FileInputStream in=new FileInputStream(file);
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String s="";
 			while((s=input.readLine())!=null){
 				String[] t=s.split("	");
@@ -2042,8 +2030,7 @@ public class Combine_PValues_FDR {
 		}
 		try{
 			FileInputStream in=new FileInputStream(file);
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String s="";
 			while((s=input.readLine())!=null){
 				String[] t=s.split("	");
@@ -2067,8 +2054,7 @@ public class Combine_PValues_FDR {
 		}
 		try{
 			FileInputStream in=new FileInputStream(file);
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String s="";
 			while((s=input.readLine())!=null){
 				String[] t=s.split("	");

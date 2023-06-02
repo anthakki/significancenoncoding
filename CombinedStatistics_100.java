@@ -23,7 +23,6 @@ import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -64,46 +63,46 @@ public class CombinedStatistics_100 {
 	static String file_genome=folder_annotation+"Hg19"+separator+"chr"; //Reference genome
 	
 	
-	static String file_splice_count=subfolder_auxiliary+"SpliceCount.txt"; //output file of the number of splice site mutations per interval
+	static String file_splice_count=subfolder_auxiliary+"SpliceCount.txt"+SignificanceNoncoding.out_suffix; //output file of the number of splice site mutations per interval
 
-	static String file_clumps_count_combi=subfolder_auxiliary+"ClumpsCountCombi_100.txt"; //output file of the clustering score in each interval
-	static String file_factor_clumps=subfolder_auxiliary+"FactorClumps_100.txt"; //output files of the weights to normalize clustering scores to a uniform distribution
-	static String file_max_factor=subfolder_auxiliary+"FactorMax_100.txt"; //output files of the factors to model distribution variance of clustering scores depending on their average
-	static String file_clumps_count_combi_indel=subfolder_auxiliary+"ClumpsCountCombiIndel_100.txt"; //output file of the clustering score in each interval (indels only)
-	static String file_factor_clumps_indel=subfolder_auxiliary+"FactorClumpsIndel_100.txt"; //output files of the weights to normalize clustering scores to a uniform distribution (indels only)
-	static String file_max_factor_indel=subfolder_auxiliary+"FactorMaxIndel_100.txt"; //output files of the factors to model distribution variance of clustering scores depending on their average (indels only)
+	static String file_clumps_count_combi=subfolder_auxiliary+"ClumpsCountCombi_100.txt"+SignificanceNoncoding.out_suffix; //output file of the clustering score in each interval
+	static String file_factor_clumps=subfolder_auxiliary+"FactorClumps_100.txt"+SignificanceNoncoding.out_suffix; //output files of the weights to normalize clustering scores to a uniform distribution
+	static String file_max_factor=subfolder_auxiliary+"FactorMax_100.txt"+SignificanceNoncoding.out_suffix; //output files of the factors to model distribution variance of clustering scores depending on their average
+	static String file_clumps_count_combi_indel=subfolder_auxiliary+"ClumpsCountCombiIndel_100.txt"+SignificanceNoncoding.out_suffix; //output file of the clustering score in each interval (indels only)
+	static String file_factor_clumps_indel=subfolder_auxiliary+"FactorClumpsIndel_100.txt"+SignificanceNoncoding.out_suffix; //output files of the weights to normalize clustering scores to a uniform distribution (indels only)
+	static String file_max_factor_indel=subfolder_auxiliary+"FactorMaxIndel_100.txt"+SignificanceNoncoding.out_suffix; //output files of the factors to model distribution variance of clustering scores depending on their average (indels only)
 
-	static String file_ww_indel=subfolder_auxiliary+"WW_Indel.txt"; //Output file of weights for weighted local average (1kb, indels only)
-	static String file_ww_10_indel=subfolder_auxiliary+"WW_10_Indel.txt"; //Output file of weights for weighted local average (10kb, indels only)
-	static String file_ww_100_indel=subfolder_auxiliary+"WW_100_Indel.txt"; //Output file of weights for weighted local average (100kb, indels only)
-	static String file_ww_combi=subfolder_auxiliary+"WW_Combi.txt"; //Output file of weights for weighted local average (1kb, all mutations)
-	static String file_ww_10_combi=subfolder_auxiliary+"WW_10_Combi.txt"; //Output file of weights for weighted local average (10kb, indels only)
-	static String file_ww_100_combi=subfolder_auxiliary+"WW_100_Combi.txt"; //Output file of weights for weighted local average (100kb, indels only)
+	static String file_ww_indel=subfolder_auxiliary+"WW_Indel.txt"+SignificanceNoncoding.out_suffix; //Output file of weights for weighted local average (1kb, indels only)
+	static String file_ww_10_indel=subfolder_auxiliary+"WW_10_Indel.txt"+SignificanceNoncoding.out_suffix; //Output file of weights for weighted local average (10kb, indels only)
+	static String file_ww_100_indel=subfolder_auxiliary+"WW_100_Indel.txt"+SignificanceNoncoding.out_suffix; //Output file of weights for weighted local average (100kb, indels only)
+	static String file_ww_combi=subfolder_auxiliary+"WW_Combi.txt"+SignificanceNoncoding.out_suffix; //Output file of weights for weighted local average (1kb, all mutations)
+	static String file_ww_10_combi=subfolder_auxiliary+"WW_10_Combi.txt"+SignificanceNoncoding.out_suffix; //Output file of weights for weighted local average (10kb, indels only)
+	static String file_ww_100_combi=subfolder_auxiliary+"WW_100_Combi.txt"+SignificanceNoncoding.out_suffix; //Output file of weights for weighted local average (100kb, indels only)
 
 		
-	static String file_count_epigenomic_combi1=subfolder_auxiliary+"EpigenomicCombi1_100.txt"; //output file for mutation counts (epigenomic model)
-	static String file_count_epigenomic_combi2=subfolder_auxiliary+"EpigenomicCombi2_100.txt"; //output file for mutation counts (epigenomic model)
-	static String file_count_epigenomic_combi3=subfolder_auxiliary+"EpigenomicCombi3_100.txt"; //output file for mutation counts (epigenomic model)
-	static String file_count_epigenomic_indel1=subfolder_auxiliary+"EpigenomicIndel1_100.txt"; //output file for indel counts (epigenomic model)
-	static String file_count_epigenomic_indel2=subfolder_auxiliary+"EpigenomicIndel2_100.txt"; //output file for indel counts (epigenomic model)
-	static String file_count_epigenomic_indel3=subfolder_auxiliary+"EpigenomicIndel3_100.txt"; //output file for indel counts (epigenomic model)
-	static String file_p_epigenomic_combi=subfolder_auxiliary+"PEpigenomiCombi100.txt"; //output file for count-based pvalues (epigenomic model)
-	static String file_p_epigenomic_indel=subfolder_auxiliary+"PEpigenomiIndel100.txt"; //output file for count-based pvalues (epigenomic model, indels only)
+	static String file_count_epigenomic_combi1=subfolder_auxiliary+"EpigenomicCombi1_100.txt"+SignificanceNoncoding.out_suffix; //output file for mutation counts (epigenomic model)
+	static String file_count_epigenomic_combi2=subfolder_auxiliary+"EpigenomicCombi2_100.txt"+SignificanceNoncoding.out_suffix; //output file for mutation counts (epigenomic model)
+	static String file_count_epigenomic_combi3=subfolder_auxiliary+"EpigenomicCombi3_100.txt"+SignificanceNoncoding.out_suffix; //output file for mutation counts (epigenomic model)
+	static String file_count_epigenomic_indel1=subfolder_auxiliary+"EpigenomicIndel1_100.txt"+SignificanceNoncoding.out_suffix; //output file for indel counts (epigenomic model)
+	static String file_count_epigenomic_indel2=subfolder_auxiliary+"EpigenomicIndel2_100.txt"+SignificanceNoncoding.out_suffix; //output file for indel counts (epigenomic model)
+	static String file_count_epigenomic_indel3=subfolder_auxiliary+"EpigenomicIndel3_100.txt"+SignificanceNoncoding.out_suffix; //output file for indel counts (epigenomic model)
+	static String file_p_epigenomic_combi=subfolder_auxiliary+"PEpigenomiCombi100.txt"+SignificanceNoncoding.out_suffix; //output file for count-based pvalues (epigenomic model)
+	static String file_p_epigenomic_indel=subfolder_auxiliary+"PEpigenomiIndel100.txt"+SignificanceNoncoding.out_suffix; //output file for count-based pvalues (epigenomic model, indels only)
 	
 	
-	static String file_count_indel1=subfolder_auxiliary+"CountIndel1_100.txt"; //output file for indel counts (similarity-based model)
-	static String file_count_indel2=subfolder_auxiliary+"CountIndel2_100.txt"; //output file for indel counts (similarity-based model)
-	static String file_count_indel3=subfolder_auxiliary+"CountIndel3_100.txt"; //output file for indel counts (similarity-based model)
-	static String file_count_combi1=subfolder_auxiliary+"CountCombi1_100.txt"; //output file for mutation counts (similarity-based model)
-	static String file_count_combi2=subfolder_auxiliary+"CountCombi2_100.txt"; //output file for mutation counts (similarity-based model)
-	static String file_count_combi3=subfolder_auxiliary+"CountCombi3_100.txt"; //output file for mutation counts (similarity-based model)
-	static String file_p_indel=subfolder_auxiliary+"PIndel100.txt"; //output file for count-based pvalues (epigenomic model, indels only)
-	static String file_p_combi=subfolder_auxiliary+"PCombi100.txt"; //output file for count-based pvalues (epigenomic model)
+	static String file_count_indel1=subfolder_auxiliary+"CountIndel1_100.txt"+SignificanceNoncoding.out_suffix; //output file for indel counts (similarity-based model)
+	static String file_count_indel2=subfolder_auxiliary+"CountIndel2_100.txt"+SignificanceNoncoding.out_suffix; //output file for indel counts (similarity-based model)
+	static String file_count_indel3=subfolder_auxiliary+"CountIndel3_100.txt"+SignificanceNoncoding.out_suffix; //output file for indel counts (similarity-based model)
+	static String file_count_combi1=subfolder_auxiliary+"CountCombi1_100.txt"+SignificanceNoncoding.out_suffix; //output file for mutation counts (similarity-based model)
+	static String file_count_combi2=subfolder_auxiliary+"CountCombi2_100.txt"+SignificanceNoncoding.out_suffix; //output file for mutation counts (similarity-based model)
+	static String file_count_combi3=subfolder_auxiliary+"CountCombi3_100.txt"+SignificanceNoncoding.out_suffix; //output file for mutation counts (similarity-based model)
+	static String file_p_indel=subfolder_auxiliary+"PIndel100.txt"+SignificanceNoncoding.out_suffix; //output file for count-based pvalues (epigenomic model, indels only)
+	static String file_p_combi=subfolder_auxiliary+"PCombi100.txt"+SignificanceNoncoding.out_suffix; //output file for count-based pvalues (epigenomic model)
 	 
-	static String file_out_sign=folder_significance+"Significance_100_"+entity_sel+"_"+shift_mut+".txt"; //output file of the combined significance that includes all p-values computed by this method 
+	static String file_out_sign=folder_significance+"Significance_100_"+entity_sel+"_"+shift_mut+".txt"+SignificanceNoncoding.out_suffix; //output file of the combined significance that includes all p-values computed by this method 
 	
-	static String file_n_indel_quality2=folder_counts_all+"n_indel_quality2_"+shift_mut+".txt"; //output file for indel counts of all cancer types (used for background calibration)
-	static String file_n_quality2=folder_counts_all+"n_quality2_"+shift_mut+".txt"; //output file for mutation counts of all cancer types (used for background calibration)
+	static String file_n_indel_quality2=folder_counts_all+"n_indel_quality2_"+shift_mut+".txt"+SignificanceNoncoding.out_suffix; //output file for indel counts of all cancer types (used for background calibration)
+	static String file_n_quality2=folder_counts_all+"n_quality2_"+shift_mut+".txt"+SignificanceNoncoding.out_suffix; //output file for mutation counts of all cancer types (used for background calibration)
 	
 	static String[][] files_donors=null; //internal file: list of sample IDs per cancer types
 	static String[][][] files_mut_snv=null; //internal file: separate files of SNV mutations per cancer types and chromosome
@@ -1839,8 +1838,7 @@ public class CombinedStatistics_100 {
 			for (int chr_index=0;chr_index<chr.length;chr_index++){
 				chromatin_1000[chr_index]=new double[1+(chr_length[chr_index]-shift_mut)/1000][4];
 				java.io.InputStream in=ZipOverlay.fileInputStream(file_epi_signal_1000+chr[chr_index]+"_"+shift_mut+".txt");
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				input.readLine();
 				String s="";
 				while((s=input.readLine())!=null){
@@ -1878,8 +1876,7 @@ public class CombinedStatistics_100 {
 				
 				chromatin_10000[chr_index]=new double[1+(chr_length[chr_index]-shift_mut)/10000][4];
 				java.io.InputStream in=ZipOverlay.fileInputStream(file_epi_signal_10000+chr[chr_index]+"_"+shift_mut+".txt");
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				input.readLine();
 				String s="";
 				while((s=input.readLine())!=null){
@@ -1913,8 +1910,7 @@ public class CombinedStatistics_100 {
 				
 				chromatin_100000[chr_index]=new double[1+(chr_length[chr_index]-shift_mut)/100000][4];
 				java.io.InputStream in=ZipOverlay.fileInputStream(file_epi_signal_100000+chr[chr_index]+"_"+shift_mut+".txt");
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				input.readLine();
 				String s="";
 				while((s=input.readLine())!=null){
@@ -2024,45 +2020,45 @@ public class CombinedStatistics_100 {
 		file_genome=folder_annotation+"Hg19"+separator+"chr";
 		
 		
-		file_splice_count=subfolder_auxiliary+"SpliceCount.txt";
+		file_splice_count=subfolder_auxiliary+"SpliceCount.txt"+SignificanceNoncoding.out_suffix;
 
-		file_clumps_count_combi=subfolder_auxiliary+"ClumpsCountCombi_100.txt";
-		file_factor_clumps=subfolder_auxiliary+"FactorClumps_100.txt";
-		file_max_factor=subfolder_auxiliary+"FactorMax_100.txt";
-		file_clumps_count_combi_indel=subfolder_auxiliary+"ClumpsCountCombiIndel_100.txt";
-		file_factor_clumps_indel=subfolder_auxiliary+"FactorClumpsIndel_100.txt";
-		file_max_factor_indel=subfolder_auxiliary+"FactorMaxIndel_100.txt";
+		file_clumps_count_combi=subfolder_auxiliary+"ClumpsCountCombi_100.txt"+SignificanceNoncoding.out_suffix;
+		file_factor_clumps=subfolder_auxiliary+"FactorClumps_100.txt"+SignificanceNoncoding.out_suffix;
+		file_max_factor=subfolder_auxiliary+"FactorMax_100.txt"+SignificanceNoncoding.out_suffix;
+		file_clumps_count_combi_indel=subfolder_auxiliary+"ClumpsCountCombiIndel_100.txt"+SignificanceNoncoding.out_suffix;
+		file_factor_clumps_indel=subfolder_auxiliary+"FactorClumpsIndel_100.txt"+SignificanceNoncoding.out_suffix;
+		file_max_factor_indel=subfolder_auxiliary+"FactorMaxIndel_100.txt"+SignificanceNoncoding.out_suffix;
 
-		file_ww_indel=subfolder_auxiliary+"WW_Indel.txt";
-		file_ww_10_indel=subfolder_auxiliary+"WW_10_Indel.txt";
-		file_ww_100_indel=subfolder_auxiliary+"WW_100_Indel.txt";
-		file_ww_combi=subfolder_auxiliary+"WW_Combi.txt";
-		file_ww_10_combi=subfolder_auxiliary+"WW_10_Combi.txt";
-		file_ww_100_combi=subfolder_auxiliary+"WW_100_Combi.txt";
+		file_ww_indel=subfolder_auxiliary+"WW_Indel.txt"+SignificanceNoncoding.out_suffix;
+		file_ww_10_indel=subfolder_auxiliary+"WW_10_Indel.txt"+SignificanceNoncoding.out_suffix;
+		file_ww_100_indel=subfolder_auxiliary+"WW_100_Indel.txt"+SignificanceNoncoding.out_suffix;
+		file_ww_combi=subfolder_auxiliary+"WW_Combi.txt"+SignificanceNoncoding.out_suffix;
+		file_ww_10_combi=subfolder_auxiliary+"WW_10_Combi.txt"+SignificanceNoncoding.out_suffix;
+		file_ww_100_combi=subfolder_auxiliary+"WW_100_Combi.txt"+SignificanceNoncoding.out_suffix;
 			
-		file_count_epigenomic_combi1=subfolder_auxiliary+"EpigenomicCombi1_100.txt";
-		file_count_epigenomic_combi2=subfolder_auxiliary+"EpigenomicCombi2_100.txt";
-		file_count_epigenomic_combi3=subfolder_auxiliary+"EpigenomicCombi3_100.txt";
-		file_count_epigenomic_indel1=subfolder_auxiliary+"EpigenomicIndel1_100.txt";
-		file_count_epigenomic_indel2=subfolder_auxiliary+"EpigenomicIndel2_100.txt";
-		file_count_epigenomic_indel3=subfolder_auxiliary+"EpigenomicIndel3_100.txt";
-		file_p_epigenomic_combi=subfolder_auxiliary+"PEpigenomiCombi100.txt";
-		file_p_epigenomic_indel=subfolder_auxiliary+"PEpigenomiIndel100.txt";
+		file_count_epigenomic_combi1=subfolder_auxiliary+"EpigenomicCombi1_100.txt"+SignificanceNoncoding.out_suffix;
+		file_count_epigenomic_combi2=subfolder_auxiliary+"EpigenomicCombi2_100.txt"+SignificanceNoncoding.out_suffix;
+		file_count_epigenomic_combi3=subfolder_auxiliary+"EpigenomicCombi3_100.txt"+SignificanceNoncoding.out_suffix;
+		file_count_epigenomic_indel1=subfolder_auxiliary+"EpigenomicIndel1_100.txt"+SignificanceNoncoding.out_suffix;
+		file_count_epigenomic_indel2=subfolder_auxiliary+"EpigenomicIndel2_100.txt"+SignificanceNoncoding.out_suffix;
+		file_count_epigenomic_indel3=subfolder_auxiliary+"EpigenomicIndel3_100.txt"+SignificanceNoncoding.out_suffix;
+		file_p_epigenomic_combi=subfolder_auxiliary+"PEpigenomiCombi100.txt"+SignificanceNoncoding.out_suffix;
+		file_p_epigenomic_indel=subfolder_auxiliary+"PEpigenomiIndel100.txt"+SignificanceNoncoding.out_suffix;
 		
 		
-		file_count_indel1=subfolder_auxiliary+"CountIndel1_100.txt";
-		file_count_indel2=subfolder_auxiliary+"CountIndel2_100.txt";
-		file_count_indel3=subfolder_auxiliary+"CountIndel3_100.txt";
-		file_count_combi1=subfolder_auxiliary+"CountCombi1_100.txt";
-		file_count_combi2=subfolder_auxiliary+"CountCombi2_100.txt";
-		file_count_combi3=subfolder_auxiliary+"CountCombi3_100.txt";
-		file_p_indel=subfolder_auxiliary+"PIndel100.txt";
-		file_p_combi=subfolder_auxiliary+"PCombi100.txt";
+		file_count_indel1=subfolder_auxiliary+"CountIndel1_100.txt"+SignificanceNoncoding.out_suffix;
+		file_count_indel2=subfolder_auxiliary+"CountIndel2_100.txt"+SignificanceNoncoding.out_suffix;
+		file_count_indel3=subfolder_auxiliary+"CountIndel3_100.txt"+SignificanceNoncoding.out_suffix;
+		file_count_combi1=subfolder_auxiliary+"CountCombi1_100.txt"+SignificanceNoncoding.out_suffix;
+		file_count_combi2=subfolder_auxiliary+"CountCombi2_100.txt"+SignificanceNoncoding.out_suffix;
+		file_count_combi3=subfolder_auxiliary+"CountCombi3_100.txt"+SignificanceNoncoding.out_suffix;
+		file_p_indel=subfolder_auxiliary+"PIndel100.txt"+SignificanceNoncoding.out_suffix;
+		file_p_combi=subfolder_auxiliary+"PCombi100.txt"+SignificanceNoncoding.out_suffix;
 		 
-		file_out_sign=folder_significance+"Significance_100_"+entity_sel+"_"+shift_mut+".txt";
+		file_out_sign=folder_significance+"Significance_100_"+entity_sel+"_"+shift_mut+".txt"+SignificanceNoncoding.out_suffix;
 		
-		file_n_indel_quality2=folder_counts_all+"n_indel_quality2_"+shift_mut+".txt";
-		file_n_quality2=folder_counts_all+"n_quality2_"+shift_mut+".txt"; 
+		file_n_indel_quality2=folder_counts_all+"n_indel_quality2_"+shift_mut+".txt"+SignificanceNoncoding.out_suffix;
+		file_n_quality2=folder_counts_all+"n_quality2_"+shift_mut+".txt"+SignificanceNoncoding.out_suffix; 
 		
 		mutations=new ArrayList[chr.length][];
 		
@@ -2191,8 +2187,8 @@ public class CombinedStatistics_100 {
 					splice_total[i]=threads[i].splice_total;
 				}
 				
-				FileWriter out=new FileWriter(file_splice_count);
-				BufferedWriter output= new BufferedWriter(out);
+				java.io.FileOutputStream out=new java.io.FileOutputStream(file_splice_count);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_splice_count)));
 				for (int i=0;i<splice.length;i++){
 					for (int j=0;j<splice[i].length;j++){
 						output.write(i+"	"+j+"	"+splice_total[i][j]+"	"+splice[i][j][0]+"	"+splice[i][j][1]);
@@ -2208,8 +2204,7 @@ public class CombinedStatistics_100 {
 				}
 				
 				FileInputStream in=new FileInputStream(file_splice_count);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String s="";
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
@@ -2381,8 +2376,8 @@ public class CombinedStatistics_100 {
 				}
 				factor_clumps[0]*=0.5;
 				
-				FileWriter out=new FileWriter(file_factor_clumps);
-				BufferedWriter output= new BufferedWriter(out);
+				java.io.FileOutputStream out=new java.io.FileOutputStream(file_factor_clumps);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_factor_clumps)));
 				for (int i=0;i<factor_clumps.length;i++){
 					
 					output.write(i+"	"+factor_clumps[i]);
@@ -2394,8 +2389,7 @@ public class CombinedStatistics_100 {
 			}
 			else{
 				FileInputStream in=new FileInputStream(file_factor_clumps);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String s="";
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
@@ -2435,8 +2429,8 @@ public class CombinedStatistics_100 {
 				}
 				
 				
-				FileWriter out=new FileWriter(file_clumps_count_combi);
-				BufferedWriter output= new BufferedWriter(out);
+				java.io.FileOutputStream out=new java.io.FileOutputStream(file_clumps_count_combi);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_clumps_count_combi)));
 				for (int i=0;i<clumps_combi.length;i++){
 					for (int j=0;j<clumps_combi[i].length;j++){
 						output.write(i+"	"+j+"	"+clumps_combi[i][j]+"	"+avg_clumps_combi[i][j]);
@@ -2453,8 +2447,7 @@ public class CombinedStatistics_100 {
 				}
 				
 				FileInputStream in=new FileInputStream(file_clumps_count_combi);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String s="";
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
@@ -2471,16 +2464,15 @@ public class CombinedStatistics_100 {
 				double[] x=max_factor(clumps_combi,avg_clumps_combi,coverage_valid);
 				max_factor_combi1=x[0];
 				max_factor_combi2=x[1];
-				FileWriter out=new FileWriter(file_max_factor);
-				BufferedWriter output= new BufferedWriter(out);
+				java.io.FileOutputStream out=new java.io.FileOutputStream(file_max_factor);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_max_factor)));
 				output.write(max_factor_combi1+"	"+max_factor_combi2);
 				output.newLine();
 				output.close();
 			}
 			else{
 				FileInputStream in=new FileInputStream(file_max_factor);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String[] t=input.readLine().split("	");
 				max_factor_combi1=Double.parseDouble(t[0]);
 				max_factor_combi2=Double.parseDouble(t[1]);
@@ -2604,8 +2596,8 @@ public class CombinedStatistics_100 {
 				}
 				factor_clumps_indel[0]*=0.5;
 				
-				FileWriter out=new FileWriter(file_factor_clumps_indel);
-				BufferedWriter output= new BufferedWriter(out);
+				java.io.FileOutputStream out=new java.io.FileOutputStream(file_factor_clumps_indel);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_factor_clumps_indel)));
 				for (int i=0;i<factor_clumps_indel.length;i++){
 					
 					output.write(i+"	"+factor_clumps_indel[i]);
@@ -2617,8 +2609,7 @@ public class CombinedStatistics_100 {
 			}
 			else{
 				FileInputStream in=new FileInputStream(file_factor_clumps_indel);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String s="";
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
@@ -2658,8 +2649,8 @@ public class CombinedStatistics_100 {
 				}
 				
 				
-				FileWriter out=new FileWriter(file_clumps_count_combi_indel);
-				BufferedWriter output= new BufferedWriter(out);
+				java.io.FileOutputStream out=new java.io.FileOutputStream(file_clumps_count_combi_indel);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_clumps_count_combi_indel)));
 				for (int i=0;i<clumps_combi_indel.length;i++){
 					for (int j=0;j<clumps_combi_indel[i].length;j++){
 						output.write(i+"	"+j+"	"+clumps_combi_indel[i][j]+"	"+avg_clumps_combi_indel[i][j]);
@@ -2676,8 +2667,7 @@ public class CombinedStatistics_100 {
 				}
 				
 				FileInputStream in=new FileInputStream(file_clumps_count_combi_indel);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String s="";
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
@@ -2694,16 +2684,15 @@ public class CombinedStatistics_100 {
 				double[] x=max_factor(clumps_combi_indel,avg_clumps_combi_indel,coverage_valid);
 				max_factor_combi_indel1=x[0];
 				max_factor_combi_indel2=x[1];
-				FileWriter out=new FileWriter(file_max_factor_indel);
-				BufferedWriter output= new BufferedWriter(out);
+				java.io.FileOutputStream out=new java.io.FileOutputStream(file_max_factor_indel);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_max_factor_indel)));
 				output.write(max_factor_combi_indel1+"	"+max_factor_combi_indel2);
 				output.newLine();
 				output.close();
 			}
 			else{
 				FileInputStream in=new FileInputStream(file_max_factor_indel);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String[] t=input.readLine().split("	");
 				max_factor_combi_indel1=Double.parseDouble(t[0]);
 				max_factor_combi_indel2=Double.parseDouble(t[1]);
@@ -2746,8 +2735,8 @@ public class CombinedStatistics_100 {
 				double[][][] count_indel3=xxxx[2+1];
 				
 				
-				FileWriter out=new FileWriter(file_p_indel);
-				BufferedWriter output= new BufferedWriter(out);
+				java.io.FileOutputStream out=new java.io.FileOutputStream(file_p_indel);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_p_indel)));
 				for (int i=0;i<p_indel.length;i++){
 					for (int j=0;j<p_indel[i].length;j++){
 						output.write(i+"	"+j+"	"+p_indel[i][j][0]+"	"+p_indel[i][j][1]+"	"+p_indel[i][j][2]);
@@ -2756,8 +2745,8 @@ public class CombinedStatistics_100 {
 				}
 				output.close();
 				
-				out=new FileWriter(file_count_indel1);
-				output= new BufferedWriter(out);
+				out=new java.io.FileOutputStream(file_count_indel1);
+				output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_count_indel1)));
 				for (int i=0;i<count_indel1.length;i++){
 					for (int j=0;j<count_indel1[i].length;j++){
 						output.write(i+"	"+j+"	"+count_indel1[i][j][0]+"	"+count_indel1[i][j][1]+"	"+count_indel1[i][j][2]);
@@ -2766,8 +2755,8 @@ public class CombinedStatistics_100 {
 				}
 				output.close();
 				
-				out=new FileWriter(file_count_indel2);
-				output= new BufferedWriter(out);
+				out=new java.io.FileOutputStream(file_count_indel2);
+				output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_count_indel2)));
 				for (int i=0;i<count_indel2.length;i++){
 					for (int j=0;j<count_indel2[i].length;j++){
 						output.write(i+"	"+j+"	"+count_indel2[i][j][0]+"	"+count_indel2[i][j][1]+"	"+count_indel2[i][j][2]);
@@ -2776,8 +2765,8 @@ public class CombinedStatistics_100 {
 				}
 				output.close();
 				
-				out=new FileWriter(file_count_indel3);
-				output= new BufferedWriter(out);
+				out=new java.io.FileOutputStream(file_count_indel3);
+				output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_count_indel3)));
 				for (int i=0;i<count_indel3.length;i++){
 					for (int j=0;j<count_indel3[i].length;j++){
 						output.write(i+"	"+j+"	"+count_indel3[i][j][0]+"	"+count_indel3[i][j][1]+"	"+count_indel3[i][j][2]);
@@ -2794,8 +2783,7 @@ public class CombinedStatistics_100 {
 					p_indel[i]=new double[1+(chr_length[i]-shift_mut)/100000][3];
 				}
 				FileInputStream in=new FileInputStream(file_p_indel);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String s="";
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
@@ -2815,8 +2803,8 @@ public class CombinedStatistics_100 {
 				double[][][] count_combi2=xxxx[1+1];
 				double[][][] count_combi3=xxxx[2+1];
 				
-				FileWriter out=new FileWriter(file_p_combi);
-				BufferedWriter output= new BufferedWriter(out);
+				java.io.FileOutputStream out=new java.io.FileOutputStream(file_p_combi);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_p_combi)));
 				for (int i=0;i<p_combi.length;i++){
 					for (int j=0;j<p_combi[i].length;j++){
 						output.write(i+"	"+j+"	"+p_combi[i][j][0]+"	"+p_combi[i][j][1]+"	"+p_combi[i][j][2]);
@@ -2826,8 +2814,8 @@ public class CombinedStatistics_100 {
 				output.close();
 				
 				
-				out=new FileWriter(file_count_combi1);
-				output= new BufferedWriter(out);
+				out=new java.io.FileOutputStream(file_count_combi1);
+				output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_count_combi1)));
 				for (int i=0;i<count_combi1.length;i++){
 					for (int j=0;j<count_combi1[i].length;j++){
 						output.write(i+"	"+j+"	"+count_combi1[i][j][0]+"	"+count_combi1[i][j][1]+"	"+count_combi1[i][j][2]);
@@ -2837,8 +2825,8 @@ public class CombinedStatistics_100 {
 				output.close();
 				
 				
-				out=new FileWriter(file_count_combi2);
-				output= new BufferedWriter(out);
+				out=new java.io.FileOutputStream(file_count_combi2);
+				output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_count_combi2)));
 				for (int i=0;i<count_combi2.length;i++){
 					for (int j=0;j<count_combi2[i].length;j++){
 						output.write(i+"	"+j+"	"+count_combi2[i][j][0]+"	"+count_combi2[i][j][1]+"	"+count_combi2[i][j][2]);
@@ -2847,8 +2835,8 @@ public class CombinedStatistics_100 {
 				}
 				output.close();
 				
-				out=new FileWriter(file_count_combi3);
-				output= new BufferedWriter(out);
+				out=new java.io.FileOutputStream(file_count_combi3);
+				output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_count_combi3)));
 				for (int i=0;i<count_combi3.length;i++){
 					for (int j=0;j<count_combi3[i].length;j++){
 						output.write(i+"	"+j+"	"+count_combi3[i][j][0]+"	"+count_combi3[i][j][1]+"	"+count_combi3[i][j][2]);
@@ -2864,8 +2852,7 @@ public class CombinedStatistics_100 {
 					p_combi[i]=new double[1+(chr_length[i]-shift_mut)/100000][3];
 				}
 				FileInputStream in=new FileInputStream(file_p_combi);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String s="";
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
@@ -2895,8 +2882,8 @@ public class CombinedStatistics_100 {
 				double[][][] count_epigenomic_combi2=xxxx[1+1];
 				double[][][] count_epigenomic_combi3=xxxx[2+1];
 				
-				FileWriter out=new FileWriter(file_p_epigenomic_combi);
-				BufferedWriter output= new BufferedWriter(out);
+				java.io.FileOutputStream out=new java.io.FileOutputStream(file_p_epigenomic_combi);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_p_epigenomic_combi)));
 				for (int i=0;i<sign_epigenomic_combi.length;i++){
 					for (int j=0;j<sign_epigenomic_combi[i].length;j++){
 						output.write(i+"	"+j+"	"+sign_epigenomic_combi[i][j][0]+"	"+sign_epigenomic_combi[i][j][1]+"	"+sign_epigenomic_combi[i][j][2]);
@@ -2905,8 +2892,8 @@ public class CombinedStatistics_100 {
 				}
 				output.close();
 				
-				out=new FileWriter(file_count_epigenomic_combi1);
-				output= new BufferedWriter(out);
+				out=new java.io.FileOutputStream(file_count_epigenomic_combi1);
+				output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_count_epigenomic_combi1)));
 				for (int i=0;i<count_epigenomic_combi1.length;i++){
 					for (int j=0;j<count_epigenomic_combi1[i].length;j++){
 						output.write(i+"	"+j+"	"+count_epigenomic_combi1[i][j][0]+"	"+count_epigenomic_combi1[i][j][1]+"	"+count_epigenomic_combi1[i][j][2]);
@@ -2916,8 +2903,8 @@ public class CombinedStatistics_100 {
 				output.close();
 				
 				
-				out=new FileWriter(file_count_epigenomic_combi2);
-				output= new BufferedWriter(out);
+				out=new java.io.FileOutputStream(file_count_epigenomic_combi2);
+				output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_count_epigenomic_combi2)));
 				for (int i=0;i<count_epigenomic_combi2.length;i++){
 					for (int j=0;j<count_epigenomic_combi2[i].length;j++){
 						output.write(i+"	"+j+"	"+count_epigenomic_combi2[i][j][0]+"	"+count_epigenomic_combi2[i][j][1]+"	"+count_epigenomic_combi2[i][j][2]);
@@ -2926,8 +2913,8 @@ public class CombinedStatistics_100 {
 				}
 				output.close();
 				
-				out=new FileWriter(file_count_epigenomic_combi3);
-				output= new BufferedWriter(out);
+				out=new java.io.FileOutputStream(file_count_epigenomic_combi3);
+				output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_count_epigenomic_combi3)));
 				for (int i=0;i<count_epigenomic_combi3.length;i++){
 					for (int j=0;j<count_epigenomic_combi3[i].length;j++){
 						output.write(i+"	"+j+"	"+count_epigenomic_combi3[i][j][0]+"	"+count_epigenomic_combi3[i][j][1]+"	"+count_epigenomic_combi3[i][j][2]);
@@ -2943,8 +2930,7 @@ public class CombinedStatistics_100 {
 					sign_epigenomic_combi[i]=new double[1+(chr_length[i]-shift_mut)/100000][3];
 				}
 				FileInputStream in=new FileInputStream(file_p_epigenomic_combi);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String s="";
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
@@ -2968,8 +2954,8 @@ public class CombinedStatistics_100 {
 				double[][][] count_epigenomic_indel2=xxxx[1+1];
 				double[][][] count_epigenomic_indel3=xxxx[2+1];
 				
-				FileWriter out=new FileWriter(file_p_epigenomic_indel);
-				BufferedWriter output= new BufferedWriter(out);
+				java.io.FileOutputStream out=new java.io.FileOutputStream(file_p_epigenomic_indel);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_p_epigenomic_indel)));
 				for (int i=0;i<sign_epigenomic_indel.length;i++){
 					for (int j=0;j<sign_epigenomic_indel[i].length;j++){
 						output.write(i+"	"+j+"	"+sign_epigenomic_indel[i][j][0]+"	"+sign_epigenomic_indel[i][j][1]+"	"+sign_epigenomic_indel[i][j][2]);
@@ -2978,8 +2964,8 @@ public class CombinedStatistics_100 {
 				}
 				output.close();
 				
-				out=new FileWriter(file_count_epigenomic_indel1);
-				output= new BufferedWriter(out);
+				out=new java.io.FileOutputStream(file_count_epigenomic_indel1);
+				output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_count_epigenomic_indel1)));
 				for (int i=0;i<count_epigenomic_indel1.length;i++){
 					for (int j=0;j<count_epigenomic_indel1[i].length;j++){
 						output.write(i+"	"+j+"	"+count_epigenomic_indel1[i][j][0]+"	"+count_epigenomic_indel1[i][j][1]+"	"+count_epigenomic_indel1[i][j][2]);
@@ -2988,8 +2974,8 @@ public class CombinedStatistics_100 {
 				}
 				output.close();
 				
-				out=new FileWriter(file_count_epigenomic_indel2);
-				output= new BufferedWriter(out);
+				out=new java.io.FileOutputStream(file_count_epigenomic_indel2);
+				output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_count_epigenomic_indel2)));
 				for (int i=0;i<count_epigenomic_indel2.length;i++){
 					for (int j=0;j<count_epigenomic_indel2[i].length;j++){
 						output.write(i+"	"+j+"	"+count_epigenomic_indel2[i][j][0]+"	"+count_epigenomic_indel2[i][j][1]+"	"+count_epigenomic_indel2[i][j][2]);
@@ -2998,8 +2984,8 @@ public class CombinedStatistics_100 {
 				}
 				output.close();
 				
-				out=new FileWriter(file_count_epigenomic_indel3);
-				output= new BufferedWriter(out);
+				out=new java.io.FileOutputStream(file_count_epigenomic_indel3);
+				output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_count_epigenomic_indel3)));
 				for (int i=0;i<count_epigenomic_indel3.length;i++){
 					for (int j=0;j<count_epigenomic_indel3[i].length;j++){
 						output.write(i+"	"+j+"	"+count_epigenomic_indel3[i][j][0]+"	"+count_epigenomic_indel3[i][j][1]+"	"+count_epigenomic_indel3[i][j][2]);
@@ -3016,8 +3002,7 @@ public class CombinedStatistics_100 {
 					sign_epigenomic_indel[i]=new double[1+(chr_length[i]-shift_mut)/100000][3];
 				}
 				FileInputStream in=new FileInputStream(file_p_epigenomic_indel);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String s="";
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
@@ -3118,8 +3103,7 @@ public class CombinedStatistics_100 {
 			
 			ArrayList<int[]> exons=new ArrayList<int[]>();
 			java.io.InputStream in=ZipOverlay.fileInputStream(file_exons);
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String s="";
 			while((s=input.readLine())!=null){
 				String[] t=s.split("	");
@@ -3148,8 +3132,7 @@ public class CombinedStatistics_100 {
 				ArrayList<Position> positions=new ArrayList<Position>();
 			
 				{ java.io.InputStream in1=ZipOverlay.fileInputStream(file_as_annotation+chr[i]+".txt");
-				inn=new DataInputStream(in1); }
-				input= new BufferedReader(new InputStreamReader(inn));
+				input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in1))); }
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
 					if(t.length==7){
@@ -3265,8 +3248,8 @@ public class CombinedStatistics_100 {
 			}
 			
 			
-			FileWriter out=new FileWriter(file_out_sign);
-			BufferedWriter output= new BufferedWriter(out);
+			java.io.FileOutputStream out=new java.io.FileOutputStream(file_out_sign);
+			BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_out_sign)));
 			
 			output.write("Chr"+"	"+"Pos"+"	"+"p_splice"+"	"+"p_clumps_combi"+"	"+"p_clumps_combi_indel"+"	"+"p_indel_min_10fold"+"	"+"p_indel_min_100fold"+"	"+"p_indel_large"+"	"+"p_combi_min_10fold"+"	"+"p_combi_min_100fold"+"	"+"p_combi_large"+"	"+"sign_epigenomic_combi_large"+"	"+"sign_epigenomic_combi_min_10fold"+"	"+"sign_epigenomic_combi_min_100fold"+"	"+"sign_epigenomic_indel_large"+"	"+"sign_epigenomic_indel_min_10fold"+"	"+"sign_epigenomic_indel_min_100fold"+"	"+"p_hotspot"+"	"+"p_destructive");
 			output.newLine();
@@ -3334,8 +3317,7 @@ public class CombinedStatistics_100 {
 		int ll=1000;
 		try{
 			FileInputStream in=new FileInputStream(file_count);
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String[] head=input.readLine().split("	");
 			String[] entities=new String[head.length-2];
 			for (int i=0;i<entities.length;i++){
@@ -3819,8 +3801,8 @@ public class CombinedStatistics_100 {
 					ww.remove(j);
 				}
 				
-				FileWriter out=new FileWriter(file_ww);
-				BufferedWriter output= new BufferedWriter(out);
+				java.io.FileOutputStream out=new java.io.FileOutputStream(file_ww);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_ww)));
 				for (int i=0;i<ww.size();i++){
 					output.write(ww.get(i)+"");
 					output.newLine();
@@ -3829,8 +3811,7 @@ public class CombinedStatistics_100 {
 			}
 			else{
 				in=new FileInputStream(file_ww);
-				inn=new DataInputStream(in);
-				input= new BufferedReader(new InputStreamReader(inn));
+				input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				while((s=input.readLine())!=null){
 					ww.add(Double.parseDouble(s));
 				}
@@ -4040,8 +4021,8 @@ public class CombinedStatistics_100 {
 					ww_10.remove(j);
 				}
 				
-				FileWriter out=new FileWriter(file_ww_10);
-				BufferedWriter output= new BufferedWriter(out);
+				java.io.FileOutputStream out=new java.io.FileOutputStream(file_ww_10);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_ww_10)));
 				for (int i=0;i<ww_10.size();i++){
 					output.write(ww_10.get(i)+"");
 					output.newLine();
@@ -4050,8 +4031,7 @@ public class CombinedStatistics_100 {
 			}
 			else{
 				in=new FileInputStream(file_ww_10);
-				inn=new DataInputStream(in);
-				input= new BufferedReader(new InputStreamReader(inn));
+				input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				while((s=input.readLine())!=null){
 					ww_10.add(Double.parseDouble(s));
 				}
@@ -4267,8 +4247,8 @@ public class CombinedStatistics_100 {
 				}
 				
 				
-				FileWriter out=new FileWriter(file_ww_100);
-				BufferedWriter output= new BufferedWriter(out);
+				java.io.FileOutputStream out=new java.io.FileOutputStream(file_ww_100);
+				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_ww_100)));
 				for (int i=0;i<ww_100.size();i++){
 					output.write(ww_100.get(i)+"");
 					output.newLine();
@@ -4277,8 +4257,7 @@ public class CombinedStatistics_100 {
 			}
 			else{
 				in=new FileInputStream(file_ww_100);
-				inn=new DataInputStream(in);
-				input= new BufferedReader(new InputStreamReader(inn));
+				input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				while((s=input.readLine())!=null){
 					ww_100.add(Double.parseDouble(s));
 				}
@@ -5615,8 +5594,7 @@ public class CombinedStatistics_100 {
 			}
 			
 			java.io.InputStream in=ZipOverlay.fileInputStream(file_coverage);
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			
 			String s="";
 			while((s=input.readLine())!=null){
@@ -5704,8 +5682,7 @@ public class CombinedStatistics_100 {
 			int a=index(entities,entities_all);
 			for (int b=0;b<files_donors[a].length;b++){
 				FileInputStream in=new FileInputStream(files_donors[a][b]);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				//input.readLine();
 				String s="";
 				while((s=input.readLine())!=null){
@@ -5759,8 +5736,7 @@ public class CombinedStatistics_100 {
 				
 				if(entities.equals("Liver")){
 					java.io.InputStream in=ZipOverlay.fileInputStream(file_exclude_regions_liver);
-					DataInputStream inn=new DataInputStream(in);
-					BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+					BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 					String s="";
 					while((s=input.readLine())!=null){
 						String[] t=s.split("	");
@@ -5773,8 +5749,7 @@ public class CombinedStatistics_100 {
 				}
 				else{
 					java.io.InputStream in=ZipOverlay.fileInputStream(file_exclude_regions_non_liver);
-					DataInputStream inn=new DataInputStream(in);
-					BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+					BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 					String s="";
 					while((s=input.readLine())!=null){
 						String[] t=s.split("	");
@@ -5981,8 +5956,7 @@ public class CombinedStatistics_100 {
 				
 				for (int b=0;b<files_donors[a].length;b++){
 					FileInputStream in=new FileInputStream(files_donors[a][b]);
-					DataInputStream inn=new DataInputStream(in);
-					BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+					BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 					//input.readLine();
 					String s="";
 					while((s=input.readLine())!=null){
@@ -6036,8 +6010,7 @@ public class CombinedStatistics_100 {
 				}
 
 				java.io.InputStream in=ZipOverlay.fileInputStream(file_exclude_regions_non_liver);
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				String s="";
 				while((s=input.readLine())!=null){
 					String[] t=s.split("	");
@@ -6303,8 +6276,8 @@ public class CombinedStatistics_100 {
 	//write the mutation counts of multiple cancer types
 	public static void output(String file_out, int[][][][] n,String[] entities){
 		try{
-			FileWriter out=new FileWriter(file_out);
-			BufferedWriter output= new BufferedWriter(out);
+			java.io.FileOutputStream out=new java.io.FileOutputStream(file_out);
+			BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_out)));
 			output.write("Chr	Pos");
 			for (int j=0;j<entities.length;j++){
 				output.write("	"+entities[j]);
@@ -6390,8 +6363,7 @@ public class CombinedStatistics_100 {
 				
 				for (int j=0;j<1+(chr_length[chr_index]-shift_mut)/1000000;j++){
 					java.io.InputStream in=ZipOverlay.fileInputStream(file_dichotomous+chr[chr_index]+"_"+j+".txt");
-					DataInputStream inn=new DataInputStream(in);
-					BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+					BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 					String s="";
 					while((s=input.readLine())!=null){
 						String[] t=s.split("	");
@@ -6521,8 +6493,7 @@ public class CombinedStatistics_100 {
 			try{
 				for (int j=0;j<1+(chr_length[chr_index]-shift_mut)/1000000;j++){
 					java.io.InputStream in=ZipOverlay.fileInputStream(file_dichotomous+chr[chr_index]+"_"+j+".txt");
-					DataInputStream inn=new DataInputStream(in);
-					BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+					BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 					String s="";
 					while((s=input.readLine())!=null){
 						String[] t=s.split("	");
@@ -6604,8 +6575,7 @@ public class CombinedStatistics_100 {
 			try{
 				Hashtable<Integer,Integer> table_code=new Hashtable<Integer,Integer>();
 				java.io.InputStream in=ZipOverlay.fileInputStream(file_as_annotation+chr[chr_index]+".txt");
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				input.readLine();
 				String s="";
 				while((s=input.readLine())!=null){
@@ -6654,8 +6624,7 @@ public class CombinedStatistics_100 {
 			try{
 				for (int b=0;b<file_mut_snv.length;b++){
 					FileInputStream in=new FileInputStream(file_mut_snv[b]);
-					DataInputStream inn=new DataInputStream(in);
-					BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+					BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 					String s="";
 					while((s=input.readLine())!=null){
 						String[] t=s.split("	");
@@ -6668,8 +6637,7 @@ public class CombinedStatistics_100 {
 				
 				for (int b=0;b<file_mut_indel.length;b++){
 					FileInputStream in=new FileInputStream(file_mut_indel[b]);
-					DataInputStream inn=new DataInputStream(in);
-					BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+					BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 					String s="";
 					while((s=input.readLine())!=null){
 						String[] t=s.split("	");
@@ -6692,8 +6660,7 @@ public class CombinedStatistics_100 {
 				int start=-1;
 				Hashtable<Integer,Integer> table_coding=new Hashtable<Integer,Integer>();
 				java.io.InputStream in=ZipOverlay.fileInputStream(file_as_annotation+chr[chr_index]+".txt");
-				DataInputStream inn=new DataInputStream(in);
-				BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 				input.readLine();
 				String s="";
 				while((s=input.readLine())!=null){
@@ -6756,8 +6723,7 @@ public class CombinedStatistics_100 {
 			try{
 				for (int b=0;b<file_mut_snv.length;b++){
 					FileInputStream in=new FileInputStream(file_mut_snv[b]);
-					DataInputStream inn=new DataInputStream(in);
-					BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+					BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 					String s="";
 					while((s=input.readLine())!=null){
 						String[] t=s.split("	");
@@ -6770,8 +6736,7 @@ public class CombinedStatistics_100 {
 				
 				for (int b=0;b<file_mut_indel.length;b++){
 					FileInputStream in=new FileInputStream(file_mut_indel[b]);
-					DataInputStream inn=new DataInputStream(in);
-					BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+					BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 					String s="";
 					while((s=input.readLine())!=null){
 						String[] t=s.split("	");
@@ -6917,8 +6882,7 @@ public class CombinedStatistics_100 {
 					Hashtable<String,double[]> table=new Hashtable<String,double[]>();
 					if(ZipOverlay.exists(new File(file_splice_ai+chr[i]+"_"+(j+1)+".txt"))){
 						java.io.InputStream in=ZipOverlay.fileInputStream(file_splice_ai+chr[i]+"_"+(j+1)+".txt");
-						DataInputStream inn=new DataInputStream(in);
-						BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+						BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 						String s="";
 						while((s=input.readLine())!=null){
 							String[] t=s.split("	");
@@ -7048,8 +7012,7 @@ public class CombinedStatistics_100 {
 		ArrayList<char[]> genome=new ArrayList<char[]>();
 		try{
 			java.io.InputStream in=ZipOverlay.fileInputStream(file_genome+c+".fa");//chr[i]
-			DataInputStream inn=new DataInputStream(in);
-			BufferedReader input= new BufferedReader(new InputStreamReader(inn));
+			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			input.readLine();
 			String s="";
 			while((s=input.readLine())!=null){
