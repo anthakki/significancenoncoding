@@ -41,6 +41,7 @@ public class SignificanceNoncoding {
 	
 	//parse arguments of the method and decide whether annotation files need to be downloaded
 	public static void main(String[] args){
+		try{
 		boolean delete_intermediate=true;
 		ArrayList<String> arg=new ArrayList<String>();
 		for (int i=0;i<args.length;i++){
@@ -68,11 +69,17 @@ public class SignificanceNoncoding {
 		else if(arg.size()==4){
 			execute(arg.get(0), arg.get(1), arg.get(3), arg.get(2), delete_intermediate, false);
 		}
+
+		}
+		catch(java.lang.Exception e){
+			e.printStackTrace();
+			System.exit(1);
+		}
 		
 	}
 	
 	//this method combines the execution of all subscripts, reformats input files for the subscripts and downloads annotation data if needed 
-	public static void execute(String entity, String file_list_mutation_files, String folder_annotation, String folder_auxiliary, boolean delete_intermediate, boolean download_annotations){
+	public static void execute(String entity, String file_list_mutation_files, String folder_annotation, String folder_auxiliary, boolean delete_intermediate, boolean download_annotations) throws java.io.IOException {
 		boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
 		if(isWindows){
 			separator="\\";
@@ -116,7 +123,7 @@ public class SignificanceNoncoding {
 			new File(folder_auxiliary+"MutationFiles"+separator).mkdir();
 		}
 		
-		try{
+		{
 			ArrayList<String> entities=new ArrayList<String>();
 			ArrayList<ArrayList<String>> files=new ArrayList<ArrayList<String>>();
 			FileInputStream in=new FileInputStream(file_list_mutation_files);
@@ -243,13 +250,6 @@ public class SignificanceNoncoding {
 			}
 		
 		}
-		catch(Exception e){
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
-		}
 	}
 	
 	//if the path file lists only file names and not absolute paths, this method adds the full path
@@ -294,19 +294,15 @@ public class SignificanceNoncoding {
 	}
 	
 	//download and unzip annotation folder
-	public static String download_unzip(String folder_destination){
+	public static String download_unzip(String folder_destination) throws java.io.IOException {
 		folder_destination=new File(folder_destination).getAbsolutePath()+separator;
-		try (BufferedInputStream inputStream = new BufferedInputStream(new URL("http://storage.googleapis.com/noncoding_analysishg19/AnnotationFilesComplete.zip").openStream());
-			FileOutputStream fileOS = new FileOutputStream(folder_destination+"AnnotationFilesComplete.zip")) {
+			BufferedInputStream inputStream = new BufferedInputStream(new URL("http://storage.googleapis.com/noncoding_analysishg19/AnnotationFilesComplete.zip").openStream());
+			FileOutputStream fileOS = new FileOutputStream(folder_destination+"AnnotationFilesComplete.zip");
 			byte data[] = new byte[1024];
 			int byteContent;
 			while ((byteContent = inputStream.read(data, 0, 1024)) != -1) {
 				fileOS.write(data, 0, byteContent);
 			}
-		}
-		catch (IOException e) {
-			System.out.println(e);
-		}
 		
 		new File(folder_destination+"AnnotationFilesComplete"+separator).mkdir();
 		new File(folder_destination+"AnnotationFilesComplete"+separator+"Align36mer_Dichotomous"+separator).mkdir();
@@ -321,7 +317,7 @@ public class SignificanceNoncoding {
 		
 		FileInputStream fis;
         byte[] buffer = new byte[1024];
-        try {
+        {
             fis = new FileInputStream(folder_destination+"AnnotationFilesComplete.zip");
             ZipInputStream zis = new ZipInputStream(fis);
             ZipEntry ze = zis.getNextEntry();
@@ -353,9 +349,6 @@ public class SignificanceNoncoding {
             new File(folder_destination+"AnnotationFilesComplete.zip").delete();
             
         }
-        catch (IOException e) {
-            e.printStackTrace();
-        }    
 	        
 	    return folder_destination+"AnnotationFilesComplete"+separator;
 		

@@ -886,8 +886,7 @@ public class CombinedStatistics_10 {
 			try{
 				Thread.sleep(10);
 			}
-			catch(Exception e){
-				System.out.println(e);
+			catch(java.lang.InterruptedException e){
 			}
 		}
 	}
@@ -926,8 +925,7 @@ public class CombinedStatistics_10 {
 			try{
 				Thread.sleep(10);
 			}
-			catch(Exception e){
-				System.out.println(e);
+			catch(java.lang.InterruptedException e){
 			}
 		}
 	}
@@ -966,18 +964,17 @@ public class CombinedStatistics_10 {
 			try{
 				Thread.sleep(10);
 			}
-			catch(Exception e){
-				System.out.println(e);
+			catch(java.lang.InterruptedException e){
 			}
 		}
 	}
 	
 	//Subthread to annotate MSI status to each mutation
-	private static class Subthread_MSI extends Thread{
+	private static class Subthread_MSI extends ThreadEx{
 		int chr_index=-1;
 		int status=0;
 		ArrayList<Mutation>[][] mutations=null;
-		public void run(){
+		public void runEx() throws java.io.IOException {
 			status=1;
 			ArrayList<char[]> genome=read_genome(chr[chr_index]);
 			
@@ -992,11 +989,11 @@ public class CombinedStatistics_10 {
 	}
 	
 	//Subthread to annotate MSI status to each mutation (multiple cancer types)
-	private static class Subthread_MSI_Multiple extends Thread{
+	private static class Subthread_MSI_Multiple extends ThreadEx{
 		int chr_index=-1;
 		int status=0;
 		ArrayList<Mutation>[][][] mutations=null;
-		public void run(){
+		public void runEx() throws java.io.IOException {
 			status=1;
 			ArrayList<char[]> genome=read_genome(chr[chr_index]);
 			for (int a=0;a<mutations.length;a++){
@@ -1449,9 +1446,9 @@ public class CombinedStatistics_10 {
 	}
 	
 	//read ChIP-seq data for 1kb intervals
-	public static double[][][] read_chromatin_1000(){
+	public static double[][][] read_chromatin_1000() throws java.io.IOException {
 		double[][][] chromatin_1000=new double[chr.length][][];
-		try{
+		{
 			for (int chr_index=0;chr_index<chr.length;chr_index++){
 				chromatin_1000[chr_index]=new double[1+(chr_length[chr_index]-shift_mut)/1000][4];
 				java.io.InputStream in=ZipOverlay.fileInputStream(file_epi_signal_1000+chr[chr_index]+"_"+shift_mut+".txt");
@@ -1479,17 +1476,14 @@ public class CombinedStatistics_10 {
 				
 			}
 		}
-		catch(Exception e){
-			System.out.println(e);
-		}
 		return chromatin_1000;
 	}
 	
 	
 	//read ChIP-seq data for 10kb intervals
-	public static double[][][] read_chromatin_10000(){
+	public static double[][][] read_chromatin_10000() throws java.io.IOException {
 		double[][][] chromatin_10000=new double[chr.length][][];
-		try{
+		{
 			for (int chr_index=0;chr_index<chr.length;chr_index++){
 				
 				chromatin_10000[chr_index]=new double[1+(chr_length[chr_index]-shift_mut)/10000][4];
@@ -1512,9 +1506,6 @@ public class CombinedStatistics_10 {
 					chromatin_10000[chr_index][j][0]-=2;
 				}
 			}
-		}
-		catch(Exception e){
-			System.out.println(e);
 		}
 		return chromatin_10000;
 	}
@@ -1592,7 +1583,7 @@ public class CombinedStatistics_10 {
 	//paths and global parameters based on outside parameters. it then reads mutations and annotation data
 	//and calls the functions to compute the different p-values for each 10kb interval described in the methods
 	//finally, it writes these p-values to a combined significance file
-	public static void execute(String entity_sel, int shift_mut, String folder_auxiliary, String folder_significance,String folder_annotation,String folder_counts_all, String[] all_entities, String[][] files_donors, String[][][] files_mut_snv, String[][][] files_mut_indel){
+	public static void execute(String entity_sel, int shift_mut, String folder_auxiliary, String folder_significance,String folder_annotation,String folder_counts_all, String[] all_entities, String[][] files_donors, String[][][] files_mut_snv, String[][][] files_mut_indel) throws java.io.IOException {
 		boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
 		if(isWindows){
 			separator="\\";
@@ -1626,7 +1617,7 @@ public class CombinedStatistics_10 {
 		interval_align=new ArrayList[chr.length][];
 		coverage=null;
 		
-		try{
+		{
 			coverage=read_coverage();
 			
 			if(!new File(file_n_indel_quality2).exists()||!new File(file_n_quality2).exists()){
@@ -1660,7 +1651,11 @@ public class CombinedStatistics_10 {
 							all_done=false;
 						}
 					}
+					try{
 					Thread.sleep(250);
+					}
+					catch(java.lang.InterruptedException error){
+					}
 				}
 				
 				for (int i=0;i<splice.length;i++){
@@ -1818,7 +1813,11 @@ public class CombinedStatistics_10 {
 							all_done=false;
 						}
 					}
+					try{
 					Thread.sleep(250);
+					}
+					catch(java.lang.InterruptedException e){
+					}
 				}
 				
 				int[] expected_combi=new int[10000];
@@ -1932,7 +1931,11 @@ public class CombinedStatistics_10 {
 							all_done=false;
 						}
 					}
+					try{
 					Thread.sleep(250);
+					}
+					catch(java.lang.InterruptedException e){
+					}
 				}
 				
 				int[] expected_combi_indel=new int[10000];
@@ -2005,7 +2008,11 @@ public class CombinedStatistics_10 {
 							all_done=false;
 						}
 					}
+					try{
 					Thread.sleep(250);
+					}
+					catch(java.lang.InterruptedException e){
+					}
 				}
 				
 				for (int i=0;i<threads_combi.length;i++){
@@ -2066,7 +2073,11 @@ public class CombinedStatistics_10 {
 							all_done=false;
 						}
 					}
+					try{
 					Thread.sleep(250);
+					}
+					catch(java.lang.InterruptedException e){
+					}
 				}
 				
 				for (int i=0;i<threads_combi_indel.length;i++){
@@ -2673,23 +2684,16 @@ public class CombinedStatistics_10 {
 			output.close();
 			
 		}
-		catch(Exception e){
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
-		}
 	}
 	
 	//method to compute count-based p-values based on the similarity of mutation rates between tumor types.
 	//for this purpose, the method first reads the counts from all cancer types and esitmates the number of mutations 
 	//in each interval based on similarity. based on this estimate, the method computes count-based p-values using a Gamma-Poisson distribution
 	//for 1kb and 10kb intervals. it then combines p-values of neighboring 1kb intervals using Tippett's method 
-	public static double[][][][] read_counts_all_entities(String file_count,String entity_sel , double[][] coverage){
+	public static double[][][][] read_counts_all_entities(String file_count,String entity_sel , double[][] coverage) throws java.io.IOException {
 		double[][][] p_result=new double[chr.length][][];
 		int ll=1000;
-		try{
+		{
 			FileInputStream in=new FileInputStream(file_count);
 			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String[] head=input.readLine().split("	");
@@ -3417,15 +3421,6 @@ public class CombinedStatistics_10 {
 			return new double[][][][]{p_result,c,c_10};
 			
 		}
-		catch(Exception e){
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
-			
-		}
-		return null;
 		
 	}
 	
@@ -3463,8 +3458,7 @@ public class CombinedStatistics_10 {
 			try{
 				Thread.sleep(10);
 			}
-			catch(Exception e){
-				System.out.println(e);
+			catch(java.lang.InterruptedException e){
 			}
 		}
 	}
@@ -3509,8 +3503,7 @@ public class CombinedStatistics_10 {
 			try{
 				Thread.sleep(10);
 			}
-			catch(Exception e){
-				System.out.println(e);
+			catch(java.lang.InterruptedException e){
 			}
 		}
 	}
@@ -3549,8 +3542,7 @@ public class CombinedStatistics_10 {
 			try{
 				Thread.sleep(10);
 			}
-			catch(Exception e){
-				System.out.println(e);
+			catch(java.lang.InterruptedException e){
 			}
 		}
 		
@@ -3725,11 +3717,8 @@ public class CombinedStatistics_10 {
 	
 	//cummulative distribution function of the Gamma distribution
 	public static double cum_gamma(double x, double alpha , double beta){
-		try{
+		{
 			return Gamma.regularizedGammaP(alpha,beta*x);
-		}
-		catch(Exception e){
-			return 0;
 		}
 	}
 	
@@ -3747,8 +3736,8 @@ public class CombinedStatistics_10 {
 	
 	//optimize the coefficients to model the variance of cluster scores based on their distribution average.
 	//factor1 establishes a linear link between average and variance, factor2 a quadratic link
-	public static double[] max_factor(double[][] clumps_combi, double[][] avg_clumps_combi, double[][] coverage){
-		try{
+	public static double[] max_factor(double[][] clumps_combi, double[][] avg_clumps_combi, double[][] coverage) throws java.io.IOException {
+		{
 			ThreadTestFactor[][] threads_factor=new ThreadTestFactor[10][50];
 			for (int i=0;i<threads_factor.length;i++){
 				for (int j=0;j<threads_factor[i].length;j++){
@@ -3823,15 +3812,6 @@ public class CombinedStatistics_10 {
 			//System.exit(0);
 			return new double[]{factor_max1,factor_max2};
 		}
-		catch(Exception e){
-			
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
-			return new double[]{0,0};
-		}
 		
 		
 		
@@ -3852,7 +3832,7 @@ public class CombinedStatistics_10 {
 			status=1;
 			ThreadLocalRandom random=ThreadLocalRandom.current();
 			
-			try{
+			{
 				
 				for (int j=0;j<mutations[i].length;j++){
 					if(table_skip.get(j)!=null){
@@ -3876,13 +3856,6 @@ public class CombinedStatistics_10 {
 					}
 				}
 			}
-			catch(Exception e){
-				StackTraceElement[] aa=e.getStackTrace();
-				for (int i=0;i<aa.length;i++){
-					System.out.println(i+"	"+aa[i].getLineNumber());
-				}
-				System.out.println(e);
-			}
 			System.out.println("End "+i);
 			status=2;
 		}
@@ -3903,7 +3876,7 @@ public class CombinedStatistics_10 {
 			status=1;
 			ThreadLocalRandom random=ThreadLocalRandom.current();
 			
-			try{
+			{
 				
 				for (int j=0;j<mutations[i].length;j++){
 					if(table_skip.get(j)!=null){
@@ -3926,13 +3899,6 @@ public class CombinedStatistics_10 {
 						}
 					}
 				}
-			}
-			catch(Exception e){
-				StackTraceElement[] aa=e.getStackTrace();
-				for (int i=0;i<aa.length;i++){
-					System.out.println(i+"	"+aa[i].getLineNumber());
-				}
-				System.out.println(e);
 			}
 			System.out.println("End "+i);
 			status=2;
@@ -3957,7 +3923,7 @@ public class CombinedStatistics_10 {
 				status=2;
 				return;
 			}
-			try{
+			{
 				for (int i=0;i<clumps_combi.length;i++){
 					for (int j=0;j<clumps_combi[i].length;j++){
 						if(low(chr[i])<=coverage[i][j]&&coverage[i][j]<high(chr[i])){
@@ -3982,9 +3948,6 @@ public class CombinedStatistics_10 {
 					}
 				}
 			}
-			catch(Exception e){
-				System.out.println(e);
-			}
 			status=2;
 		}
 	}
@@ -4004,7 +3967,7 @@ public class CombinedStatistics_10 {
 			status=1;
 			ThreadLocalRandom random=ThreadLocalRandom.current();
 			
-			try{
+			{
 				
 				avg_clumps=new double[1+(chr_length[i]-shift_mut)/10000];
 				clumps=new double[1+(chr_length[i]-shift_mut)/10000];
@@ -4036,13 +3999,6 @@ public class CombinedStatistics_10 {
 					}
 				}
 			}
-			catch(Exception e){
-				StackTraceElement[] aa=e.getStackTrace();
-				for (int i=0;i<aa.length;i++){
-					System.out.println(i+"	"+aa[i].getLineNumber());
-				}
-				System.out.println(e);
-			}
 			System.out.println("End "+i);
 			status=2;
 		}
@@ -4064,7 +4020,7 @@ public class CombinedStatistics_10 {
 			status=1;
 			ThreadLocalRandom random=ThreadLocalRandom.current();
 			
-			try{
+			{
 				
 				avg_clumps=new double[1+(chr_length[i]-shift_mut)/10000];
 				clumps=new double[1+(chr_length[i]-shift_mut)/10000];
@@ -4095,13 +4051,6 @@ public class CombinedStatistics_10 {
 					
 					}
 				}
-			}
-			catch(Exception e){
-				StackTraceElement[] aa=e.getStackTrace();
-				for (int i=0;i<aa.length;i++){
-					System.out.println(i+"	"+aa[i].getLineNumber());
-				}
-				System.out.println(e);
 			}
 			System.out.println("End "+i);
 			status=2;
@@ -4384,9 +4333,9 @@ public class CombinedStatistics_10 {
 	}
 	
 	//read coverage files
-	public static double[][] read_coverage(){
+	public static double[][] read_coverage() throws java.io.IOException {
 		double[][] coverage=new double[chr.length][];
-		try{
+		{
 			double[][] coverage_n=new double[chr.length][];
 			for (int i=0;i<chr.length;i++){
 				coverage[i]=new double[1+(chr_length[i]-shift_mut)/10000];
@@ -4422,13 +4371,6 @@ public class CombinedStatistics_10 {
 					}
 				}
 			}
-		}
-		catch(Exception e){
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
 		}
 		return coverage;
 	}
@@ -4490,8 +4432,8 @@ public class CombinedStatistics_10 {
 	}
 	
 	//read mutations of one cancer type and exclude low-quality mutations and problematic regions
-	public static void read_mutations (String entities){//ArrayList<Mutation>[][] 
-		try{
+	public static void read_mutations (String entities) throws java.io.IOException {//ArrayList<Mutation>[][] 
+		{
 			ArrayList<String> donors=new ArrayList<String>();;
 			int a=index(entities,all_entities);
 			for (int b=0;b<files_donors[a].length;b++){
@@ -4535,7 +4477,11 @@ public class CombinedStatistics_10 {
 						all_done=false;
 					}
 				}
+				try{
 				Thread.sleep(250);
+				}
+				catch(java.lang.InterruptedException e){
+				}
 			}
 			System.out.println("A");
 			
@@ -4596,7 +4542,11 @@ public class CombinedStatistics_10 {
 						all_done=false;
 					}
 				}
+				try{
 				Thread.sleep(250);
+				}
+				catch(java.lang.InterruptedException e){
+				}
 			}
 			System.out.println("A");
 			
@@ -4638,7 +4588,11 @@ public class CombinedStatistics_10 {
 						all_done=false;
 					}
 				}
+				try{
 				Thread.sleep(250);
+				}
+				catch(java.lang.InterruptedException e){
+				}
 			}
 			System.out.println("A");
 			
@@ -4660,7 +4614,11 @@ public class CombinedStatistics_10 {
 						all_done=false;
 					}
 				}
+				try{
 				Thread.sleep(250);
+				}
+				catch(java.lang.InterruptedException e){
+				}
 			}
 			System.out.println("A");
 			System.out.println("msi done")	;
@@ -4680,19 +4638,12 @@ public class CombinedStatistics_10 {
 			}
 			
 		}
-		catch(Exception e){
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
-		}
 		//return pos_snv;
 	}
 	
 	//read mutations of multiple cancer types and exclude low-quality mutations and problematic regions
-	public static void read_mutations_entitites (String[] entity){ 
-		try{
+	public static void read_mutations_entitites (String[] entity) throws java.io.IOException { 
+		{
 			
 			ArrayList<String>[] donors=new ArrayList[entity.length];
 			ArrayList<Mutation>[][][] positions=new ArrayList[entity.length][][];
@@ -4742,7 +4693,11 @@ public class CombinedStatistics_10 {
 							all_done=false;
 						}
 					}
+					try{
 					Thread.sleep(250);
+					}
+					catch(java.lang.InterruptedException e){
+					}
 				}
 				
 			}
@@ -4789,7 +4744,11 @@ public class CombinedStatistics_10 {
 							all_done=false;
 						}
 					}
+					try{
 					Thread.sleep(250);
+					}
+					catch(java.lang.InterruptedException e){
+					}
 				}
 			}
 			System.out.println("XXXX3");
@@ -4809,7 +4768,11 @@ public class CombinedStatistics_10 {
 							all_done=false;
 						}
 					}
+					try{
 					Thread.sleep(250);
+					}
+					catch(java.lang.InterruptedException e){
+					}
 				}
 			}
 			System.out.println("Coding Annotation done");
@@ -4833,7 +4796,11 @@ public class CombinedStatistics_10 {
 							all_done=false;
 						}
 					}
+					try{
 					Thread.sleep(250);
+					}
+					catch(java.lang.InterruptedException e){
+					}
 				}
 			}
 			
@@ -4856,7 +4823,11 @@ public class CombinedStatistics_10 {
 							all_done=false;
 						}
 					}
+					try{
 					Thread.sleep(250);
+					}
+					catch(java.lang.InterruptedException e){
+					}
 				}
 				
 				
@@ -4881,7 +4852,11 @@ public class CombinedStatistics_10 {
 						all_done=false;
 					}
 				}
+				try{
 				Thread.sleep(250);
+				}
+				catch(java.lang.InterruptedException e){
+				}
 			}
 			
 			
@@ -5011,18 +4986,11 @@ public class CombinedStatistics_10 {
 			output(file_n_indel_quality2,n_indel_quality2,entity);
 			output(file_n_quality2,n_quality2,entity);
 		}
-		catch(Exception e){
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
-		}
 	}
 	
 	//write the mutation counts of multiple cancer types
-	public static void output(String file_out, int[][][][] n,String[] entities){
-		try{
+	public static void output(String file_out, int[][][][] n,String[] entities) throws java.io.IOException {
+		{
 			java.io.FileOutputStream out=new java.io.FileOutputStream(file_out);//+".txt"
 			BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_out)));
 			output.write("Chr	Pos");
@@ -5043,9 +5011,6 @@ public class CombinedStatistics_10 {
 			}
 			output.close();
 			
-		}
-		catch(Exception e){
-			System.out.println(e);
 		}
 	}
 	
@@ -5110,12 +5075,12 @@ public class CombinedStatistics_10 {
 	}
 	
 	//Subthread to annotate 36mer based alignment scores for mutations of a single cancer type
-	private static class SubthreadAnnotateAlignSingle extends Thread{
+	private static class SubthreadAnnotateAlignSingle extends ThreadEx{
 		int chr_index=-1;
 		int status=0;
-		public void run(){
+		public void runEx() throws java.io.IOException {
 			status=1;
-			try{
+			{
 				interval_align[chr_index]=new ArrayList[1+(chr_length[chr_index]-shift_mut)/10000];
 				alignability[chr_index]=new double[1+(chr_length[chr_index]-shift_mut)/10000];
 				alignability_fine[chr_index]=new double[1+(chr_length[chr_index]-shift_mut)/1000];
@@ -5232,24 +5197,21 @@ public class CombinedStatistics_10 {
 				}
 				
 			}
-			catch(Exception e){
-				System.out.println(e);
-			}
 			status=2;
 		}
 		
 	}
 	
 	//Subthread to annotate 36mer based alignment scores for mutations of multiple cancer types
-	private static class SubthreadAnnotateAlign extends Thread{
+	private static class SubthreadAnnotateAlign extends ThreadEx{
 		
 		int chr_index=-1;
 		ArrayList<Mutation>[][][] mutations_entities=null;
 		int status=0;
 		
-		public void run(){
+		public void runEx() throws java.io.IOException {
 			status=1;
-			try{
+			{
 				for (int j=0;j<1+(chr_length[chr_index]-shift_mut)/1000000;j++){
 					java.io.InputStream in=ZipOverlay.fileInputStream(file_dichotomous+chr[chr_index]+"_"+j+".txt");
 					BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
@@ -5288,9 +5250,6 @@ public class CombinedStatistics_10 {
 				
 				
 			}
-			catch(Exception e){
-				System.out.println(e);
-			}
 			status=2;
 		}
 	}
@@ -5326,13 +5285,13 @@ public class CombinedStatistics_10 {
 	}
 	
 	//Subthread to annotate which mutations are coding
-	private static class SubthreadAnnotateCoding extends Thread{
+	private static class SubthreadAnnotateCoding extends ThreadEx{
 		int chr_index=-1;
 		ArrayList<Mutation>[][][] positions=null;
 		int status=0;
-		public void run(){
+		public void runEx() throws java.io.IOException {
 			status=1;
-			try{
+			{
 				Hashtable<Integer,Integer> table_code=new Hashtable<Integer,Integer>();
 				java.io.InputStream in=ZipOverlay.fileInputStream(file_as_annotation+chr[chr_index]+".txt");
 				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
@@ -5364,24 +5323,21 @@ public class CombinedStatistics_10 {
 					}
 				}
 			}
-			catch(Exception e){
-				System.out.println(e);
-			}
 			status=2;
 		}
 	}
 	
 	//Subthread to read mutations of a signle cancer type
-	private static class SubthreadReadSingle extends Thread{
+	private static class SubthreadReadSingle extends ThreadEx{
 		int chr_index=-1;
 		ArrayList<Mutation>[][] positions=null;
 		ArrayList<String> donors=null;
 		String[] file_mut_snv=null;
 		String[] file_mut_indel=null;
 		int status=0;
-		public void run(){
+		public void runEx() throws java.io.IOException {
 			status=1;
-			try{
+			{
 				for (int b=0;b<file_mut_snv.length;b++){
 					FileInputStream in=new FileInputStream(file_mut_snv[b]);
 					BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
@@ -5458,16 +5414,13 @@ public class CombinedStatistics_10 {
 				}
 				
 			}
-			catch(Exception e){
-				System.out.println(e);
-			}
 			status=2;
 		}
 		
 	}
 	
 	//Subthread to read mutations of multiple cancer types
-	private static class SubthreadRead extends Thread{
+	private static class SubthreadRead extends ThreadEx{
 		int chr_index=-1;
 		int a=-1;
 		ArrayList<Mutation>[][][] positions=null;
@@ -5475,9 +5428,9 @@ public class CombinedStatistics_10 {
 		String[] file_mut_snv=null;
 		String[] file_mut_indel=null;
 		int status=0;
-		public void run(){
+		public void runEx() throws java.io.IOException {
 			status=1;
-			try{
+			{
 				for (int b=0;b<file_mut_snv.length;b++){
 					FileInputStream in=new FileInputStream(file_mut_snv[b]);
 					BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
@@ -5510,13 +5463,6 @@ public class CombinedStatistics_10 {
 					input.close();
 				}
 			}
-			catch(Exception e){
-				StackTraceElement[] aa=e.getStackTrace();
-				for (int i=0;i<aa.length;i++){
-					System.out.println(i+"	"+aa[i].getLineNumber());
-				}
-				System.out.println(e);
-			}
 			status=2;
 		}
 		
@@ -5534,7 +5480,7 @@ public class CombinedStatistics_10 {
 			Comparator<Mutation> comp_mut=(Mutation m1, Mutation m2)->{
 				return new Integer(m1.pos).compareTo(m2.pos);
 			};
-			try{
+			{
 				ArrayList<Integer>[] index_kat=new ArrayList[positions.length];
 				for (int i=0;i<positions.length;i++){
 					index_kat[i]=new ArrayList<Integer>();
@@ -5564,9 +5510,6 @@ public class CombinedStatistics_10 {
 				}
 		
 			}
-			catch(Exception e){
-				System.out.println(e);
-			}
 			status=2;
 		}
 		
@@ -5583,7 +5526,7 @@ public class CombinedStatistics_10 {
 		
 		public void run(){
 			status=1;
-			try{
+			{
 				
 				Comparator<Mutation> comp_mut=(Mutation m1, Mutation m2)->{
 					return new Integer(m1.pos).compareTo(m2.pos);
@@ -5616,31 +5559,24 @@ public class CombinedStatistics_10 {
 					}
 				}
 			}
-			catch(Exception e){
-				StackTraceElement[] aa=e.getStackTrace();
-				for (int i=0;i<aa.length;i++){
-					System.out.println(i+"	"+aa[i].getLineNumber());
-				}
-				System.out.println(e);
-			}
 			status=2;
 		}
 		
 	}
 		
 	//Subthread to annotate which mutations are in splice sites
-	private static class SubthreadSplice extends Thread{
+	private static class SubthreadSplice extends ThreadEx{
 		int i=-1;
 		double[][] coverage=null;
 		ArrayList<Mutation>[][] mutations=null;
 		int[][] splice=null;
 		int[] splice_total=null;
 		int status=0;
-		public void run(){
+		public void runEx() throws java.io.IOException {
 			status=1;
 			splice=new int[1+(chr_length[i]-shift_mut)/10000][2];
 			splice_total=new int[1+(chr_length[i]-shift_mut)/10000];
-			try{
+			{
 				for (int j=0;j<chr_length[i]/1000000;j++){
 					Hashtable<String,double[]> table=new Hashtable<String,double[]>();
 					if(ZipOverlay.exists(new File(file_splice_ai+chr[i]+"_"+(j+1)+".txt"))){
@@ -5681,13 +5617,6 @@ public class CombinedStatistics_10 {
 						
 					}
 				}
-			}
-			catch(Exception e){
-				StackTraceElement[] aa=e.getStackTrace();
-				for (int i=0;i<aa.length;i++){
-					System.out.println(i+"	"+aa[i].getLineNumber());
-				}
-				System.out.println(e);
 			}
 			status=2;
 		}
@@ -5756,9 +5685,9 @@ public class CombinedStatistics_10 {
 	}
 	
 	//read reference genome for a chromosome
-	public static ArrayList<char[]> read_genome(String c){
+	public static ArrayList<char[]> read_genome(String c) throws java.io.IOException {
 		ArrayList<char[]> genome=new ArrayList<char[]>();
-		try{
+		{
 			java.io.InputStream in=ZipOverlay.fileInputStream(file_genome+c+".fa");//chr[i]
 			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			input.readLine();
@@ -5767,13 +5696,6 @@ public class CombinedStatistics_10 {
 				genome.add(s.toUpperCase().toCharArray());
 			}
 			input.close();
-		}
-		catch(Exception e){
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
 		}
 		
 		return genome;

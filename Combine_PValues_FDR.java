@@ -183,7 +183,7 @@ public class Combine_PValues_FDR {
 	//to arrive at q-values for 10kb and 100kb intervalls. finally, it derives a combined genome-wide signal of significance by combining the FDR from 10kb and 100kb intervals
 	//that annotates a unique significance value to each position in the human genome
 	//based on this signal, it identifies significantly mutated regions (FDR<0.1) and annotates the closest gene
-	public static void execute(String entity, String folder_annotationX,  String folder_significanceX, String folder_auxiliaryX){
+	public static void execute(String entity, String folder_annotationX,  String folder_significanceX, String folder_auxiliaryX) throws java.io.IOException {
 		boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
 		if(isWindows){
 			separator="\\";
@@ -203,7 +203,7 @@ public class Combine_PValues_FDR {
 		symbol=new ArrayList<String>();
 		table=new Hashtable<String,Integer>();
 		
-		try{
+		{
 			load_genes();
 			read_symbol_list();
 			
@@ -297,17 +297,10 @@ public class Combine_PValues_FDR {
 			
 			
 		}
-		catch(Exception e){
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
-		}
 	}
 	
 	//read coverage files for 10kb intervals with multiple interval offsets
-	public static double[][][] read_coverage(int[] shift_mut){
+	public static double[][][] read_coverage(int[] shift_mut) throws java.io.IOException {
 		double[][][] coverage=new double[shift_mut.length][][];
 		for (int i=0;i<shift_mut.length;i++){
 			coverage[i]=read_coverage(shift_mut[i]);
@@ -316,7 +309,7 @@ public class Combine_PValues_FDR {
 	}
 	
 	//read coverage files for 100kb intervals with multiple interval offsets
-	public static boolean[][][] read_coverage_valid(int[] shift_mut){
+	public static boolean[][][] read_coverage_valid(int[] shift_mut) throws java.io.IOException {
 		boolean[][][] coverage_valid=new boolean[shift_mut.length][][];
 		for (int i=0;i<shift_mut.length;i++){
 			coverage_valid[i]=read_coverage_valid(shift_mut[i]);
@@ -325,7 +318,7 @@ public class Combine_PValues_FDR {
 	}
 	
 	//read coverage file for 100kb intervals for a single offset
-	public static boolean[][] read_coverage_valid(int shift_mut){
+	public static boolean[][] read_coverage_valid(int shift_mut) throws java.io.IOException {
 		double[][] coverage=read_coverage(shift_mut);
 		
 		int[][] coverage_valid_n=new int[chr.length][];
@@ -361,9 +354,9 @@ public class Combine_PValues_FDR {
 	}
 	
 	//read coverage file for 10kb intervals for a single offset
-	public static double[][] read_coverage(int shift_mut){
+	public static double[][] read_coverage(int shift_mut) throws java.io.IOException {
 		double[][] coverage=new double[chr.length][];
-		try{
+		{
 			double[][] coverage_n=new double[chr.length][];
 			for (int i=0;i<chr.length;i++){
 				coverage[i]=new double[1+(chr_length[i]-shift_mut)/10000];
@@ -399,13 +392,6 @@ public class Combine_PValues_FDR {
 					}
 				}
 			}
-		}
-		catch(Exception e){
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
 		}
 		return coverage;
 	}
@@ -584,8 +570,8 @@ public class Combine_PValues_FDR {
 	}
 	
 	//read list of official gene symbols and initizalize look up tables to assign gene names to their official symbols
-	public static void read_symbol_list(){
-		try{
+	public static void read_symbol_list() throws java.io.IOException {
+		{
 			java.io.InputStream in=ZipOverlay.fileInputStream(file_symbols);
 			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			input.readLine();
@@ -610,13 +596,6 @@ public class Combine_PValues_FDR {
 				n++;
 			}
 			input.close();
-		}
-		catch(Exception e){
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
 		}
 	}
 	
@@ -645,9 +624,9 @@ public class Combine_PValues_FDR {
 	}
 	
 	//load genes genes borders from Hg19 annotation 
-	public static void load_genes(){
+	public static void load_genes() throws java.io.IOException {
 		
-		try{
+		{
 			for (int i=0;i<chr.length;i++){
 				
 				java.io.InputStream in=ZipOverlay.fileInputStream(file_genes+chr[i]+"_Hg19.bed");
@@ -682,13 +661,6 @@ public class Combine_PValues_FDR {
 			
 			
 		}
-		catch(Exception e){
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
-		}	
 	}
 	
 	
@@ -768,7 +740,7 @@ public class Combine_PValues_FDR {
 	}
 	
 	//read significance for 10kb intervals, combine significance values for each interval, and perform weighted multiple hypothesis correction
-	public static double[][][][] read_sign_fdr(String entity, double[] max95, boolean expression_available, double[][][] coverage){
+	public static double[][][][] read_sign_fdr(String entity, double[] max95, boolean expression_available, double[][][] coverage) throws java.io.IOException {
 		int[] shift1={0,2500,5000,7500};
 		int width=10000;
 		double[][][][] fdr=new double[shift1.length][][][];
@@ -816,7 +788,7 @@ public class Combine_PValues_FDR {
 	}
 	
 	//read significance for 100kb intervals, combine significance values for each interval, and perform weighted multiple hypothesis correction
-	public static double[][][][] read_sign_fdr_100(String entity, double[] max95, boolean expression_available, boolean[][][] coverage_valid){
+	public static double[][][][] read_sign_fdr_100(String entity, double[] max95, boolean expression_available, boolean[][][] coverage_valid) throws java.io.IOException {
 		int width=100000;
 		int[] shift2={0,25000,50000,75000};
 		
@@ -862,13 +834,13 @@ public class Combine_PValues_FDR {
 	}
 	
 	//read cancer type specific expression files and annotate expression to each gene
-	public static double[] read_expression(String[] entity2){
+	public static double[] read_expression(String[] entity2) throws java.io.IOException {
 		double[] max95=new double[gene_names.size()];
 		for (int i=0;i<max95.length;i++){
 			max95[i]=Double.NaN;
 		}
 		
-		try{
+		{
 			Hashtable<String,String> conversion_mir=new Hashtable<String,String>();
 			String s="";
 			java.io.InputStream in=ZipOverlay.fileInputStream(file_transform_mir);
@@ -968,13 +940,6 @@ public class Combine_PValues_FDR {
 				input.close();
 			}
 			
-		}
-		catch(Exception e){
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
 		}
 		return max95;
 	}
@@ -1406,8 +1371,8 @@ public class Combine_PValues_FDR {
 	}
 	
 	//combined significance values of 10kb intervals to one combined significance value per interval using Brown's method
-	public static double[][] read_sign(String entity, int shift){
-		try{
+	public static double[][] read_sign(String entity, int shift) throws java.io.IOException {
+		{
 			String[] files_clumps={
 					folder_auxiliary+entity+"_10kb_"+shift+separator+"ClumpsCountCombi.txt"+SignificanceNoncoding.out_suffix,
 					folder_auxiliary+entity+"_10kb_"+shift+separator+"ClumpsCountCombiIndel.txt"+SignificanceNoncoding.out_suffix
@@ -1634,14 +1599,6 @@ public class Combine_PValues_FDR {
 			return sign_final;
 			
 		}
-		catch(Exception e){
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
-		}
-		return null;
 		
 	}
 	
@@ -1695,8 +1652,8 @@ public class Combine_PValues_FDR {
 	}
 	
 	//combined significance values of 100kb intervals to one combined significance value per interval using Brown's method
-	public static double[][] read_sign_100(String entity, int shift){
-		try{
+	public static double[][] read_sign_100(String entity, int shift) throws java.io.IOException {
+		{
 			String[] files_clumps={
 					folder_auxiliary+entity+"_100kb_"+shift+separator+"ClumpsCountCombi_100.txt"+SignificanceNoncoding.out_suffix,
 					folder_auxiliary+entity+"_100kb_"+shift+separator+"ClumpsCountCombiIndel_100.txt"+SignificanceNoncoding.out_suffix
@@ -1941,24 +1898,16 @@ public class Combine_PValues_FDR {
 			return sign_final;
 			
 		}
-		catch(Exception e){
-			StackTraceElement[] aa=e.getStackTrace();
-			for (int i=0;i<aa.length;i++){
-				System.out.println(i+"	"+aa[i].getLineNumber());
-			}
-			System.out.println(e);
-		}
-		return null;
 		
 	}
 	
 	//read max mutation counts of 1kb intervals per 10kb interval
-	public static double[][] read_count_1000(String file, int shift){
+	public static double[][] read_count_1000(String file, int shift) throws java.io.IOException {
 		double[][] count=new double[chr.length][];
 		for (int i=0;i<chr.length;i++){
 			count[i]=new double[1+(chr_length[i]-shift)/10000];
 		}
-		try{
+		{
 			FileInputStream in=new FileInputStream(file);
 			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String s="";
@@ -1970,19 +1919,16 @@ public class Combine_PValues_FDR {
 			}
 			input.close();
 		}
-		catch(Exception e){
-			System.out.println(e);
-		}
 		return count;
 	}
 	
 	//read mutation counts of 10kb intervals
-	public static double[][] read_count_10000(String file, int shift){
+	public static double[][] read_count_10000(String file, int shift) throws java.io.IOException {
 		double[][] count=new double[chr.length][];
 		for (int i=0;i<chr.length;i++){
 			count[i]=new double[1+(chr_length[i]-shift)/10000];
 		}
-		try{
+		{
 			FileInputStream in=new FileInputStream(file);
 			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String s="";
@@ -1992,19 +1938,16 @@ public class Combine_PValues_FDR {
 			}
 			input.close();
 		}
-		catch(Exception e){
-			System.out.println(e);
-		}
 		return count;
 	}
 	
 	//read max mutation counts of 1kb intervals per 100kb interval
-	public static double[][] read_100_count_1000(String file, int shift){
+	public static double[][] read_100_count_1000(String file, int shift) throws java.io.IOException {
 		double[][] count=new double[chr.length][];
 		for (int i=0;i<chr.length;i++){
 			count[i]=new double[1+(chr_length[i]-shift)/100000];
 		}
-		try{
+		{
 			FileInputStream in=new FileInputStream(file);
 			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String s="";
@@ -2016,19 +1959,16 @@ public class Combine_PValues_FDR {
 			}
 			input.close();
 		}
-		catch(Exception e){
-			System.out.println(e);
-		}
 		return count;
 	}
 	
 	//read max mutation counts of 10kb intervals per 100kb interval
-	public static double[][] read_100_count_10000(String file, int shift){
+	public static double[][] read_100_count_10000(String file, int shift) throws java.io.IOException {
 		double[][] count=new double[chr.length][];
 		for (int i=0;i<chr.length;i++){
 			count[i]=new double[1+(chr_length[i]-shift)/100000];
 		}
-		try{
+		{
 			FileInputStream in=new FileInputStream(file);
 			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String s="";
@@ -2040,19 +1980,16 @@ public class Combine_PValues_FDR {
 			}
 			input.close();
 		}
-		catch(Exception e){
-			System.out.println(e);
-		}
 		return count;
 	}
 	
 	//read mutation counts of 100kb intervals
-	public static double[][] read_100_count_100000(String file, int shift){
+	public static double[][] read_100_count_100000(String file, int shift) throws java.io.IOException {
 		double[][] count=new double[chr.length][];
 		for (int i=0;i<chr.length;i++){
 			count[i]=new double[1+(chr_length[i]-shift)/100000];
 		}
-		try{
+		{
 			FileInputStream in=new FileInputStream(file);
 			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String s="";
@@ -2061,9 +1998,6 @@ public class Combine_PValues_FDR {
 				count[Integer.parseInt(t[0])][Integer.parseInt(t[1])]=Double.parseDouble(t[2]);
 			}
 			input.close();
-		}
-		catch(Exception e){
-			System.out.println(e);
 		}
 		return count;
 	}
