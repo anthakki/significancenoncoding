@@ -3459,9 +3459,9 @@ public class CombinedStatistics_100 {
 				}
 			}
 			
-			Matrix X_2=new Matrix(c_2);
-			Matrix Y_2=new Matrix(cc_2);
-			Matrix bbeta_2=(X_2.transpose().times(X_2)).inverse().times(X_2.transpose()).times(Y_2);
+			Matrix X_2=new Matrix(c_2, a, entities.length-1);
+			Matrix Y_2=new Matrix(cc_2, a, 1);
+			Matrix bbeta_2=LSQSolve.solve(X_2, Y_2);
 			
 			double[] coef_global_2=new double[entities.length-1];
 			double baseline_global_2=0;
