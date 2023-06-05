@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# default settings
+java_opts=()
+k_opt=''
+z_opt=''
+opts=()
+jar_path="$0.jar"
+default_annotation_folder="$(dirname "$0")/AnnotationFilesComplete/"
+
+# process arguments
+while [ $# -gt 0 ]; do
+	case "$1" in
+		-cp|-classpath)
+			java_opts+=("$1")
+			java_opts+=("$2")
+			shift
+			;;
+		-default_annotation_folder)
+			default_annotation_folder="$2"
+			shift
+			;;
+		-k)
+			k_opt="$1"
+			;;
+		-jar_path)
+			jar_path="$2"
+			shift
+			;;
+		-z*)
+			z_opt="$1"
+			;;
+		-*)
+			java_opts+=("$1")
+			;;
+		*)
+			opts+=("$1")
+			;;
+	esac
+	shift
+done
+
+# print usage
+usage() {
+	echo "Usage: $(basename "$0") [java-opts] [-k] [-z] entity path_file output_folder [annotation_folder]" >&2
+	exit 1
+}
+
+# check usage
+if   [ "${#opts[@]}" -eq 3 ]; then
+	opts+=("$default_annotation_folder")
+elif [ "${#opts[@]}" -eq 4 ]; then
+	:
+else
+	usage
+fi
+
+# let's go..
+exec java "${java_opts[@]}" -jar "$jar_path" $k_opt $z_opt "${opts[@]}"
