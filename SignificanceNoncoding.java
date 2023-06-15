@@ -143,9 +143,28 @@ public class SignificanceNoncoding {
 			String[][][] files_mut_snv=new String[entities.size()][chr.length][1];
 			String[][][] files_mut_indel=new String[entities.size()][chr.length][1];
 			String[][] files_donors=new String[entities.size()][1];
-			
-			System.out.println("A");
+
 			String [] all_entities=to_array(entities);
+
+			boolean input_done = true;
+			for (int i=0;i<files.size();i++){
+				for (int ii=0;ii<chr.length;ii++){
+					files_mut_snv[i][ii][0]=folder_auxiliary+"MutationFiles"+separator+"Mutations_Chr"+chr[ii]+"_"+entities.get(i)+"_SNV.txt"+out_suffix;
+					input_done = input_done && new java.io.File(files_mut_snv[i][ii][0]).exists();
+
+					files_mut_indel[i][ii][0]=folder_auxiliary+"MutationFiles"+separator+"Mutations_Chr"+chr[ii]+"_"+entities.get(i)+"_Indel.txt"+out_suffix;
+					input_done = input_done && new java.io.File(files_mut_indel[i][ii][0]).exists();
+				}
+
+				files_donors[i][0]=folder_auxiliary+"MutationFiles"+separator+"Donors_"+entities.get(i)+".txt"+out_suffix;
+				input_done = input_done && new java.io.File(files_donors[i][0]).exists();
+			}
+
+			System.out.println("A");
+			if (input_done) {
+				System.out.println("[<< reusing previous MutationFiles>>]");
+			}
+			else {
 			for (int i=0;i<files.size();i++){
 				System.out.println(files.get(i));
 				
@@ -220,6 +239,7 @@ public class SignificanceNoncoding {
 				}
 				output_donor.close();
 			}
+			} // !input_done
 			System.out.println("A");
 			
 			for (int i=0;i<4;i++){
