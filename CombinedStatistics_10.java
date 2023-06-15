@@ -1520,6 +1520,8 @@ public class CombinedStatistics_10 {
 			int k=0;
 			while(genome(mut.pos+1,mut.pos+rep_len,genome).equals(genome(mut.pos+(k+1)*rep_len+1,mut.pos+(k+2)*rep_len,genome))){
 				k++;
+				if (k*rep_len>=5)   // NB. early exit for OOB
+					return !mut.coding;
 			}
 			if(k*rep_len>len_max){
 				len_max=k*rep_len;
@@ -1529,6 +1531,8 @@ public class CombinedStatistics_10 {
 			k=0;
 			while(genome(mut.pos-rep_len,mut.pos-1,genome).equals(genome(mut.pos-((k+2)*rep_len),mut.pos-((k+1)*rep_len+1),genome))){
 				k++;
+				if (k*rep_len>=5)
+					return !mut.coding;
 			}
 			if(k*rep_len>len_max){
 				len_max=k*rep_len;
@@ -5676,13 +5680,11 @@ public class CombinedStatistics_10 {
 	public static char genome(int pos, ArrayList<char[]> genome){
 		
 		if(pos-1>=0&&(pos-1)/50<genome.size()){
-			return genome.get((pos-1)/50)[(pos-1)%50];
+			char[] s = genome.get((pos-1)/50);
+			if((pos-1)%50<s.length)
+				return s[(pos-1)%50];
 		}
-		else{
-			return 'N';
-		}
-	
-		
+		return 'N';
 	}
 	
 	//read reference genome for a chromosome
