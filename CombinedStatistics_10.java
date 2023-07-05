@@ -1831,8 +1831,8 @@ public class CombinedStatistics_10 {
 					add(observed_combi,threads_dist[i].observed);
 				}
 				
-				int sum_expected=0;
-				int sum_observed=0;
+				long sum_expected=0;
+				long sum_observed=0;
 				for (int i=0;i<expected_combi.length;i++){
 					sum_expected+=expected_combi[i];
 					sum_observed+=observed_combi[i];
@@ -1949,8 +1949,8 @@ public class CombinedStatistics_10 {
 					add(observed_combi_indel,threads_dist_indel[i].observed);
 				}
 				
-				int sum_expected_indel=0;
-				int sum_observed_indel=0;
+				long sum_expected_indel=0;
+				long sum_observed_indel=0;
 				for (int i=0;i<expected_combi_indel.length;i++){
 					sum_expected_indel+=expected_combi_indel[i];
 					sum_observed_indel+=observed_combi_indel[i];
