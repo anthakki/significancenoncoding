@@ -1469,47 +1469,38 @@ public class Combine_PValues_FDR {
 			}
 			input.close();
 	
-			double aavg=0;
-			double aavg_n=0;
-			double aavgX=0;
-			double aavgX_n=0;
+			double aavg, var, aavgX, varX;
+			{
+				MVNEstimator est = new MVNEstimator( 13+4 );
+				double[] x = new double[est.dim()];
+
+				MVNEstimator estX = new MVNEstimator( 13+4 );
+				double[] xX = new double[estX.dim()];
+
 			for (int i=0;i<sign.length;i++){
 				for (int j=0;j<sign[i].length;j++){
-					double product=product(sign[i][j]);
-					double productX=productX(sign[i][j]);
+					double product=productValues(x, sign[i][j]);
+					double productX=productXValues(xX, sign[i][j]);
 					
 					if(0<product&&product<1){
-						aavg+=-2*Math.log(product);
-						aavg_n++;
+						for (int k=0;k<x.length;k++)
+							x[k]=-2*Math.log(x[k]);
+						est.update(x);
 					}
 					if(0<productX&&productX<1){
-						aavgX+=-2*Math.log(productX);
-						aavgX_n++;
+						for (int k=0;k<xX.length;k++)
+							xX[k]=-2*Math.log(xX[k]);
+						estX.update(xX);
 					}
 				}
 			}
-			
-			
-			aavg/=aavg_n;
-			aavgX/=aavgX_n;
-			
-			double var=0;
-			double varX=0;
-			for (int i=0;i<sign.length;i++){
-				for (int j=0;j<sign[i].length;j++){
-					double product=product(sign[i][j]);
-					double productX=productX(sign[i][j]);
-					
-					if(0<product&&product<1){
-						var+=(-2*Math.log(product)-aavg)*(-2*Math.log(product)-aavg);
-					}
-					if(0<productX&&productX<1){
-						varX+=(-2*Math.log(productX)-aavgX)*(-2*Math.log(productX)-aavgX);
-					}
-				}
+
+				aavg = 2 * est.dim();
+				var = 4 * sum( est.cor() ); // NB. 4 * est.dim() for independent
+
+				aavgX = 2 * estX.dim();
+				varX = 4 * sum( estX.cor() );
 			}
-			var/=aavg_n;
-			varX/=aavgX_n;
 			
 			double cc=var/(2*aavg);
 			double kk=2*aavg*aavg/var;
@@ -1619,6 +1610,26 @@ public class Combine_PValues_FDR {
 		
 		return product;
 	}
+	protected static double _productValues(double[] x_sel, double[] x, int[] index_sel, int[] aux_sel){
+		int t=0;
+
+		double product=1;
+		for (int i=0;i<index_sel.length;i++){
+			x_sel[t++]=x[index_sel[i]];
+			product*=x[index_sel[i]];
+		}
+		double product_aux=1;
+		for (int i=0;i<aux_sel.length;i++){
+			x_sel[t++]=x[aux_sel[i]];
+			product_aux*=x[aux_sel[i]];
+		}
+		product*=product_aux;
+
+		return product;
+	}
+	public static double productValues(double[] x_sel, double[] x){
+		return _productValues(x_sel, x, new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12}, new int[]{11,1,2,12});
+	}
 	
 	//auxiliary method for combining p-values if 100kb intervals
 	public static double product100(double[] x){
@@ -1630,6 +1641,9 @@ public class Combine_PValues_FDR {
 		}
 		product*=x[15]*x[1]*x[2]*x[16];
 		return product;
+	}
+	public static double product100Values(double[] x_sel, double x[]){
+		return _productValues(x_sel, x, new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}, new int[]{15,1,2,16});
 	}
 
 	//auxiliary method for combining p-values if 10kb intervals
@@ -1643,6 +1657,9 @@ public class Combine_PValues_FDR {
 		product*=x[11]*x[1]*x[2]*x[12];
 		return product;
 	}
+	public static double productXValues(double[] x_sel, double[] x) {
+		return _productValues(x_sel, x, new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12}, new int[]{11,1,2,12});
+	}
 
 	//auxiliary method for combining p-values if 100kb intervals
 	public static double product100X(double[] x){
@@ -1654,6 +1671,9 @@ public class Combine_PValues_FDR {
 		}
 		product*=x[15]*x[1]*x[2]*x[16];
 		return product;
+	}
+	public static double product100XValues(double[] x_sel, double[] x) {
+		return _productValues(x_sel, x, new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}, new int[]{15,1,2,16});
 	}
 	
 	//combined significance values of 100kb intervals to one combined significance value per interval using Brown's method
@@ -1768,49 +1788,39 @@ public class Combine_PValues_FDR {
 				}
 			}
 			input.close();
-			
 
-			double aavg=0;
-			double aavg_n=0;
-			double aavgX=0;
-			double aavgX_n=0;
+			double aavg, var, aavgX, varX;
+			{
+				MVNEstimator est = new MVNEstimator( 17+4 );
+				double[] x = new double[est.dim()];
+
+				MVNEstimator estX = new MVNEstimator( 17+4 );
+				double[] xX = new double[estX.dim()];
+			
 			for (int i=0;i<sign.length;i++){
 				for (int j=0;j<sign[i].length;j++){
-					double product=product100(sign[i][j]);
-					double productX=product100X(sign[i][j]);
+					double product=product100Values(x, sign[i][j]);
+					double productX=product100XValues(xX, sign[i][j]);
 					
 					if(0<product&&product<1){
-						aavg+=-2*Math.log(product);
-						aavg_n++;
+						for (int k=0;k<x.length;k++)
+							x[k]=-2*Math.log(x[k]);
+						est.update(x);
 					}
 					if(0<productX&&productX<1){
-						aavgX+=-2*Math.log(productX);
-						aavgX_n++;
+						for (int k=0;k<xX.length;k++)
+							xX[k]=-2*Math.log(xX[k]);
+						estX.update(xX);
 					}
 				}
 			}
-			
-			
-			aavg/=aavg_n;
-			aavgX/=aavgX_n;
-			
-			double var=0;
-			double varX=0;
-			for (int i=0;i<sign.length;i++){
-				for (int j=0;j<sign[i].length;j++){
-					double product=product100(sign[i][j]);
-					double productX=product100X(sign[i][j]);
-					
-					if(0<product&&product<1){
-						var+=(-2*Math.log(product)-aavg)*(-2*Math.log(product)-aavg);
-					}
-					if(0<productX&&productX<1){
-						varX+=(-2*Math.log(productX)-aavgX)*(-2*Math.log(productX)-aavgX);
-					}
-				}
+
+				aavg = 2 * est.dim();
+				var = 4 * sum( est.cor() );
+
+				aavgX = 2 * estX.dim();
+				varX = 4 * sum( estX.cor() );
 			}
-			var/=aavg_n;
-			varX/=aavgX_n;
 			
 			double cc=var/(2*aavg);
 			double kk=2*aavg*aavg/var;
@@ -2016,5 +2026,18 @@ public class Combine_PValues_FDR {
 		return -1;
 	}
 	
+	protected static double sum(double[] x) {
+		double s = 0.;
+		for (int i = 0; i < x.length; ++i)
+			s += x[i];
+		return s;
+	}
+
+	protected static double sum(double[][] X) {
+		double s = 0.;
+		for (int i = 0; i < X.length; ++i)
+			s += sum(X[i]);
+		return s;
+	}
 	
 }
