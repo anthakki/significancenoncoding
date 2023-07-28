@@ -643,39 +643,6 @@ public class CombinedStatistics_100 {
 			}
 		}
 		
-		double avg=0;
-		double avg_n=0;
-		for (int i=0;i<chr.length;i++){
-			for (int j=0;j<1+(chr_length[i]-shift_mut)/10000;j++){
-				if(low(chr[i])<=coverage[i][j]&&coverage[i][j]<high(chr[i])&&!Double.isNaN(alpha_10000[i][j])&&!Double.isNaN(beta_10000[i][j])&&alpha_10000[i][j]!=0&&beta_10000[i][j]!=0){
-					if(0.001<sign_10000[i][j]&&sign_10000[i][j]<1){
-						avg+=-2*Math.log(sign_10000[i][j]);
-						avg_n++;
-					}
-					
-				}
-			}
-		}
-		avg/=avg_n;
-		
-		double var=0;
-		for (int i=0;i<chr.length;i++){
-			for (int j=0;j<1+(chr_length[i]-shift_mut)/10000;j++){
-				if(low(chr[i])<=coverage[i][j]&&coverage[i][j]<high(chr[i])&&!Double.isNaN(alpha_10000[i][j])&&!Double.isNaN(beta_10000[i][j])&&alpha_10000[i][j]!=0&&beta_10000[i][j]!=0){
-					if(0.001<sign_10000[i][j]&&sign_10000[i][j]<1){
-						var+=(-2*Math.log(sign_10000[i][j])-avg)*(-2*Math.log(sign_10000[i][j])-avg);
-					}
-					
-				}
-			}
-		}
-		
-		var/=avg_n;
-		double cc=var/(2*avg);
-		double kk=2*avg*avg/var;
-		
-		ChiSquaredDistribution dist=new ChiSquaredDistribution(kk);
-		
 		double[][] p_min=new double [chr.length][];
 		for (int i=0;i<p_min.length;i++){
 			p_min[i]=new double[1+(chr_length[i]-shift_mut)/100000];
@@ -683,26 +650,50 @@ public class CombinedStatistics_100 {
 				p_min[i][j]=1;
 			}
 		}
+
+		int size = 10;
+		double effSize;
+		{
+			MVNEstimator est = new MVNEstimator(size);
+			double[] z = new double[size];
+		for (int i=0;i<chr.length;i++){
+			for (int j=0;j<1+(chr_length[i]-shift_mut)/100000;j++){
+				if(coverage_valid[i][j]){//low(chr[i])<=coverage[i][j]&&coverage[i][j]<high(chr[i])
+					for (int k=0;k<size;k++){
+						if(j*size+k<sign_10000[i].length){
+							z[k]=( sign_10000[i][j*size+k] );
+						}
+						else{
+							z[k]=0.5;
+						}
+					}
+					est.update(z);
+				}
+			}
+		}
+			effSize = est.effSize();
+		}
+
 		for (int i=0;i<chr.length;i++){
 			for (int j=0;j<1+(chr_length[i]-shift_mut)/100000;j++){
 				if(coverage_valid[i][j]){//low(chr[i])<=coverage[i][j]&&coverage[i][j]<high(chr[i])
 					double min=1;
-					for (int k=0;k<10;k++){
-						if(j*10+k<sign_10000[i].length&&sign_10000[i][j*10+k]<min){
-							min=sign_10000[i][j*10+k];
+					for (int k=0;k<size;k++){
+						if(j*size+k<sign_10000[i].length&&sign_10000[i][j*size+k]<min){
+							min=sign_10000[i][j*size+k];
 						}
 					}
 					if(Double.isNaN(min)){
 						min=1;
 					}
 					else if(min>0){
-						min=1-dist.cumulativeProbability(-2*Math.log(min)/cc);
+						min=min;
 					}
 					else{
 						min=0;
 					}
 					
-					p_min[i][j]=(1-Math.pow(1-min,10));//Math.pow(min,0.8)
+					p_min[i][j]=(1-Math.pow(1-min,effSize));
 				
 				}
 				
@@ -909,39 +900,6 @@ public class CombinedStatistics_100 {
 				
 			}
 		}
-
-		double avg=0;
-		double avg_n=0;
-		for (int i=0;i<chr.length;i++){
-			for (int j=0;j<1+(chr_length[i]-shift_mut)/1000;j++){
-				if(low(chr[i])<=coverage[i][j/10]&&coverage[i][j/10]<high(chr[i])&&!Double.isNaN(alpha_1000[i][j])&&!Double.isNaN(beta_1000[i][j])&&alpha_1000[i][j]!=0&&beta_1000[i][j]!=0){
-					if(0.001<sign_1000[i][j]&&sign_1000[i][j]<1){
-						avg+=-2*Math.log(sign_1000[i][j]);
-						avg_n++;
-					}
-					
-				}
-			}
-		}
-		avg/=avg_n;
-		
-		double var=0;
-		for (int i=0;i<chr.length;i++){
-			for (int j=0;j<1+(chr_length[i]-shift_mut)/1000;j++){
-				if(low(chr[i])<=coverage[i][j/10]&&coverage[i][j/10]<high(chr[i])&&!Double.isNaN(alpha_1000[i][j])&&!Double.isNaN(beta_1000[i][j])&&alpha_1000[i][j]!=0&&beta_1000[i][j]!=0){
-					if(0.001<sign_1000[i][j]&&sign_1000[i][j]<1){
-						var+=(-2*Math.log(sign_1000[i][j])-avg)*(-2*Math.log(sign_1000[i][j])-avg);
-					}
-					
-				}
-			}
-		}
-		
-		var/=avg_n;
-		double cc=var/(2*avg);
-		double kk=2*avg*avg/var;
-		
-		ChiSquaredDistribution dist=new ChiSquaredDistribution(kk);
 		
 		double[][] p_min=new double [chr.length][];
 		for (int i=0;i<p_min.length;i++){
@@ -950,26 +908,50 @@ public class CombinedStatistics_100 {
 				p_min[i][j]=1;
 			}
 		}
+
+		int size = 100;
+		double effSize;
+		{
+			MVNEstimator est = new MVNEstimator(size);
+			double[] z = new double[size];
+		for (int i=0;i<chr.length;i++){
+			for (int j=0;j<1+(chr_length[i]-shift_mut)/100000;j++){
+				if(coverage_valid[i][j]){
+					for (int k=0;k<size;k++){
+						if(j*size+k<sign_1000[i].length){
+							z[k]=( sign_1000[i][j*size+k] );
+						}
+						else{
+							z[k]=0.5;
+						}
+					}
+					est.update(z);
+				}
+			}
+		}
+			effSize = est.effSize();
+		}
+
 		for (int i=0;i<chr.length;i++){
 			for (int j=0;j<1+(chr_length[i]-shift_mut)/100000;j++){
 				if(coverage_valid[i][j]){
 					double min=1;
-					for (int k=0;k<100;k++){
-						if(j*100+k<sign_1000[i].length&&sign_1000[i][j*100+k]<min){
-							min=sign_1000[i][j*100+k];
+					for (int k=0;k<size;k++){
+						if(j*size+k<sign_1000[i].length&&sign_1000[i][j*size+k]<min){
+							min=sign_1000[i][j*size+k];
 						}
 					}
 					if(Double.isNaN(min)){
 						min=1;
 					}
 					else if(min>0){
-						min=1-dist.cumulativeProbability(-2*Math.log(min)/cc);
+						min=min;
 					}
 					else{
 						min=0;
 					}
 					
-					p_min[i][j]=(1-Math.pow(1-min,100));//Math.pow(min,0.8)
+					p_min[i][j]=(1-Math.pow(1-min,effSize));
 				
 				}
 				
