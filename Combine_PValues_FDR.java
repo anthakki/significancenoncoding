@@ -1025,7 +1025,10 @@ public class Combine_PValues_FDR {
 				cum_n1+=n1[i];
 				cum_n2+=n2[i];
 				
-				ratio[i]=((double)(cum_n1)/(double)(n1_total))/((double)(cum_n2)/(double)(n2_total));
+				// NB. assume lhs -> rhs as n -> 0
+				double lhs = (double)(cum_n1) / (double)(n1_total);
+				double rhs = (double)(cum_n2) / (double)(n2_total);
+				ratio[i] = n1_total > 0 && n2_total > 0 ? lhs / rhs : 1.;
 			}
 			
 			double[] ratio_max=new double[ratio.length];
@@ -1163,7 +1166,9 @@ public class Combine_PValues_FDR {
 				cum_n1+=n1[i];
 				cum_n2+=n2[i];
 				
-				ratio[i]=((double)(cum_n1)/(double)(n1_total))/((double)(cum_n2)/(double)(n2_total));
+				double lhs = (double)(cum_n1) / (double)(n1_total);
+				double rhs = (double)(cum_n2) / (double)(n2_total);
+				ratio[i] = n1_total > 0 && n2_total > 0 ? lhs / rhs : 1.;
 			}
 			
 			double[] ratio_max=new double[ratio.length];
