@@ -1294,9 +1294,7 @@ public class CombinedStatistics_100 {
 							zz=9;
 						}
 					
-						if(count_1000[i][j]<500){
-							histo_1000[k_max][zz][count_1000[i][j]]++;
-						}
+						histo_1000[k_max][zz] = histo_push( histo_1000[k_max][zz], count_1000[i][j] );
 					}
 					
 					
@@ -1369,9 +1367,7 @@ public class CombinedStatistics_100 {
 							zz=9;
 						}
 						
-						if(count_10000[i][j]<500){
-							histo_10000[k_max][zz][count_10000[i][j]]++;
-						}
+						histo_10000[k_max][zz] = histo_push( histo_10000[k_max][zz], count_10000[i][j] );
 					}
 					
 					
@@ -1443,9 +1439,7 @@ public class CombinedStatistics_100 {
 							zz=9;
 						}
 						
-						if(count_100000[i][j]<5000){
-							histo_100000[k_max][zz][count_100000[i][j]]++;//[i][half]
-						}
+						histo_100000[k_max][zz] = histo_push( histo_100000[k_max][zz], count_100000[i][j] );
 					}
 					
 					
@@ -3539,10 +3533,7 @@ public class CombinedStatistics_100 {
 					if(low(chr[i])<=coverage[i][j*ll/10000]&&coverage[i][j*ll/10000]<high(chr[i])){
 						if(!Double.isNaN(prediction[i][j])){
 							int ii=index(prediction[i][j],intervals);
-							if(count[i][j]<histo[ii].length){
-								histo[ii][(int)(count[i][j])]++;
-								
-							}
+							histo[ii] = histo_push( histo[ii], (int)(count[i][j]) );
 							
 						}
 					}
@@ -3590,10 +3581,7 @@ public class CombinedStatistics_100 {
 					if(low(chr[i])<=coverage[i][j]&&coverage[i][j]<high(chr[i])){
 						if(!Double.isNaN(prediction_10[i][j])){
 							int ii=index(prediction_10[i][j],intervals_10);
-							if(counts_10[i][j]<histo_10[ii].length){
-								histo_10[ii][(int)(counts_10[i][j])]++;
-								
-							}
+							histo_10[ii] = histo_push( histo_10[ii], (int)(counts_10[i][j]) );
 							
 						}
 					}
@@ -3642,10 +3630,7 @@ public class CombinedStatistics_100 {
 					if(coverage_valid[i][j]){
 						if(!Double.isNaN(prediction_100[i][j])){
 							int ii=index(prediction_100[i][j],intervals_100);
-							if(counts_100[i][j]<histo_100[ii].length){
-								histo_100[ii][(int)(counts_100[i][j])]++;
-								
-							}
+							histo_100[ii] = histo_push( histo_100[ii], (int)(counts_100[i][j]) );
 							
 						}
 					}
@@ -4744,6 +4729,18 @@ public class CombinedStatistics_100 {
 			n+=histo[i];
 		}
 		return n;
+	}
+
+	//add a value to a histogram, extending it if necessary
+	public static int[] histo_push(int[] histo, int x){
+		int len = histo.length;
+		while (!(x < len))
+			len += len / 2;
+		if (histo.length < len)
+			histo = java.util.Arrays.copyOf(histo, len);
+
+		++histo[x];
+		return histo;
 	}
 	
 	//average of a count-based distribution function
