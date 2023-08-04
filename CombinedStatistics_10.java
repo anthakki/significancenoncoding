@@ -4428,6 +4428,57 @@ public class CombinedStatistics_10 {
 			this.alt_as=alt_as;
 		}
 	}
+
+	//dump mutations read below
+	public static void dump_mutations(String file_mutations_converted, ArrayList<Mutation>[][] mutations) throws java.io.IOException {
+		java.io.BufferedWriter output = new java.io.BufferedWriter(
+			new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(
+				new java.io.FileOutputStream(file_mutations_converted),
+				file_mutations_converted)));
+
+		for (int i = 0; i < mutations.length; ++i)
+			for (int j = 0; j < mutations[i].length; ++j)
+				for (int k = 0; k < mutations[i][j].size(); ++k) {
+					Mutation m = mutations[i][j].get(k);
+					output.write(String.format(
+						"%s" + "\t" + "%d" + "\t" + "%s" + "\t" + "%s" + "\t" + "%s" + "\t" + "%b" + "\t" + "%d" + "\t" + "%b" + "\t" + "%b" + "\t" + "%b" + "\n",
+						chr[i],       m.pos,        m.ref,        m.alt,        m.donor,      m.coding,     m.group,      m.msi,        m.msi2,       m.exclude));
+				}
+
+		output.close();
+	}
+
+	//read the dump
+	public static ArrayList<Mutation>[][] read_mutations_dump(String file_mutations_converted) throws java.io.IOException {
+		java.io.BufferedReader input = new java.io.BufferedReader(
+			new java.io.InputStreamReader(ZipFilter.filterInputStream(
+				new java.io.FileInputStream(file_mutations_converted))));
+
+		ArrayList<Mutation>[][] mutations = new ArrayList[chr.length][];
+		for (int i = 0; i < mutations.length; ++i) {
+			mutations[i] = new ArrayList[ 1 + ( chr_length[i] - shift_mut ) / 10000 ]; 
+			for (int j = 0; j < mutations[i].length; ++j)
+				mutations[i][j] = new ArrayList<Mutation>();
+		}
+
+		int i = 0;
+		for (String s; (s = input.readLine()) != null;) {
+			String[] t = s.split("\t");
+
+			String m_chr = t[0];
+			Mutation m = new Mutation( Integer.parseInt(t[1]), t[2], t[3], t[4] );
+			m.coding = Boolean.parseBoolean(t[5]);
+			m.group = Integer.parseInt(t[6]);
+
+			while (!chr[i].equals(m_chr))
+				++i;
+
+			if (m.pos >= shift_mut)
+				mutations[i][ ( m.pos - shift_mut ) / 10000 ].add(m);
+		}
+
+		return mutations;
+	}
 	
 	//read mutations of one cancer type and exclude low-quality mutations and problematic regions
 	public static void read_mutations (String entities) throws java.io.IOException {//ArrayList<Mutation>[][] 
@@ -4621,6 +4672,14 @@ public class CombinedStatistics_10 {
 			System.out.println("A");
 			System.out.println("msi done")	;
 			
+			if (!SignificanceNoncoding.delete_intermediate && shift_mut == 0) {
+				String file_mutations_converted = folder_auxiliary + separator + "MutationFiles" + separator + String.format("Converted_%s.txt", entities) + SignificanceNoncoding.out_suffix;
+				System.out.println(String.format("Dumping mutations to \"%s\"..", file_mutations_converted));
+
+				// NB. the data is *not* sorted within the buckets
+				dump_mutations(file_mutations_converted, mutations);
+			}
+
 			remove_bad_msi_samples();
 			System.out.println("remove msi done")	;
 			
