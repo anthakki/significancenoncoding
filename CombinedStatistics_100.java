@@ -2456,20 +2456,18 @@ public class CombinedStatistics_100 {
 			
 			
 			double[][] p_clumps_combi=new double[chr.length][];
+			{
+				MaxFactor max_f = new MaxFactor(MaxFactor.DTY_LOGT, MaxFactor.VAR_P12);
+				double[] max_F = new double[]{ max_factor_combi1, max_factor_combi2 };
 			for (int i=0;i<clumps_combi.length;i++){
 				p_clumps_combi[i]=new double[1+(chr_length[i]-shift_mut)/100000];
 				for (int j=0;j<clumps_combi[i].length;j++){
 					if(coverage_valid[i][j]){//low(chr[i])<=coverage[i][j]&&coverage[i][j]<high(chr[i])
-						double avg_c=avg_clumps_combi[i][j];
-						double var_c=avg_clumps_combi[i][j]*max_factor_combi1+avg_clumps_combi[i][j]*avg_clumps_combi[i][j]*max_factor_combi2;
-						double alpha=avg_c*avg_c/var_c;
-						double beta=avg_c/var_c;
-						
 						if(clumps_combi[i][j]==0||avg_clumps_combi[i][j]==0){
 							p_clumps_combi[i][j]=1.0;
 						}
 						else{
-							p_clumps_combi[i][j]=1-cum_gamma(clumps_combi[i][j],alpha,beta);
+							p_clumps_combi[i][j]=max_f.eval( clumps_combi[i][j], avg_clumps_combi[i][j], max_F );
 						}
 					}
 					else{
@@ -2477,7 +2475,7 @@ public class CombinedStatistics_100 {
 					}
 				}
 			}
-			
+			}
 			
 			ArrayList<int[]> counts_all_indel=new ArrayList<int[]>();
 			for (int i=0;i<mutations.length;i++){
@@ -2683,20 +2681,18 @@ public class CombinedStatistics_100 {
 			}
 			
 			double[][] p_clumps_combi_indel=new double[chr.length][];
+			{
+				MaxFactor max_f = new MaxFactor(MaxFactor.DTY_LOGT, MaxFactor.VAR_P12);
+				double[] max_F = new double[]{ max_factor_combi_indel1, max_factor_combi_indel2 };
 			for (int i=0;i<clumps_combi_indel.length;i++){
 				p_clumps_combi_indel[i]=new double[1+(chr_length[i]-shift_mut)/100000];
 				for (int j=0;j<clumps_combi_indel[i].length;j++){
 					if(coverage_valid[i][j]){//low(chr[i])<=coverage[i][j]&&coverage[i][j]<high(chr[i])
-						double avg_c_indel=avg_clumps_combi_indel[i][j];
-						double var_c_indel=avg_clumps_combi_indel[i][j]*max_factor_combi_indel1+avg_clumps_combi_indel[i][j]*avg_clumps_combi_indel[i][j]*max_factor_combi_indel2;
-						double alpha_indel=avg_c_indel*avg_c_indel/var_c_indel;
-						double beta_indel=avg_c_indel/var_c_indel;
-						
 						if(clumps_combi_indel[i][j]==0||avg_clumps_combi_indel[i][j]==0){
 							p_clumps_combi_indel[i][j]=1.0;
 						}
 						else{
-							p_clumps_combi_indel[i][j]=1-cum_gamma(clumps_combi_indel[i][j],alpha_indel,beta_indel);
+							p_clumps_combi_indel[i][j]=max_f.eval( clumps_combi_indel[i][j], avg_clumps_combi_indel[i][j], max_F );
 						}
 					}
 					else{
@@ -2707,7 +2703,7 @@ public class CombinedStatistics_100 {
 					
 				}
 			}
-			
+			}
 			
 			double[][][] p_indel=null;
 			if(!new File(file_p_indel).exists()||!new File(file_count_indel1).exists()||!new File(file_count_indel2).exists()||!new File(file_count_indel3).exists()){
@@ -4371,55 +4367,6 @@ public class CombinedStatistics_100 {
 		
 	}
 	
-	
-
-	//execute multiple Threads in parallel
-	public static void execute(ThreadTestFactor[][] threads, int no_cpu){
-		boolean all_done=false;
-		while(!all_done){
-			all_done=true;
-			int n1=0;
-			int n2=0;		
-			for (int i=0;i<threads.length;i++){
-				for (int j=0;j<threads[i].length;j++){
-					if(threads[i][j].status==0){
-						n1++;
-					}
-					if(threads[i][j].status==1){
-						n2++;
-					}
-					if(threads[i][j].status!=2){
-						all_done=false;
-					}
-				}
-				
-			}
-			if(n1>0&&n2<no_cpu){
-				for (int i=0;i<threads.length;i++){
-					for (int j=0;j<threads[i].length;j++){
-						if(threads[i][j].status==0){
-							threads[i][j].status=1;
-							threads[i][j].start();
-							n1--;
-							n2++;
-							if(n1==0||n2>=no_cpu){
-								break;
-							}
-						}
-					}
-					
-				}
-			}
-			try{
-				Thread.sleep(10);
-			}
-			catch(java.lang.InterruptedException e){
-			}
-		}
-		
-		
-	}
-	
 	//execute multiple Threads in parallel
 	public static void execute(SubthreadX[] threads, int no_cpu){
 		boolean all_done=false;
@@ -4852,19 +4799,6 @@ public class CombinedStatistics_100 {
 		return var;
 	}
 	
-
-	//cummulative distribution function of the Gamma distribution
-	public static double cum_gamma(double x, double alpha , double beta){
-		{
-			return Gamma.regularizedGammaP(alpha,beta*x);
-		}
-	}
-	
-	//density function of the Gamma distribution
-	public static double gamma(double x, double alpha , double beta){
-		return Math.log(beta)*alpha-Gamma.logGamma(alpha)+Math.log(x)*(alpha-1)-beta*x;
-	}
-	
 	public static void add(int[] x, int[] y){
 		for (int i=0;i<x.length;i++){
 			x[i]+=y[i];
@@ -4875,78 +4809,33 @@ public class CombinedStatistics_100 {
 	//optimize the coefficients to model the variance of cluster scores based on their distribution average.
 	//factor1 establishes a linear link between average and variance, factor2 a quadratic link
 	public static double[] max_factor(double[][] clumps_combi, double[][] avg_clumps_combi, boolean[][] coverage_valid){
-		//System.out.println("Max factor");
-		{
-			ThreadTestFactor[][] threads_factor=new ThreadTestFactor[10][50];
-			for (int i=0;i<threads_factor.length;i++){
-				for (int j=0;j<threads_factor[i].length;j++){
-					threads_factor[i][j]=new ThreadTestFactor();
-					threads_factor[i][j].avg_clumps_combi=avg_clumps_combi;
-					threads_factor[i][j].clumps_combi=clumps_combi;
-					threads_factor[i][j].factor1=(double)(i+1)*0.1;
-					threads_factor[i][j].factor2=(double)(j+1)*0.001;
-					threads_factor[i][j].coverage_valid=coverage_valid;
-					//threads_factor[i][j].start();
+		int top = 0;
+		for (int i = 0; i < clumps_combi.length; ++i)
+			for (int j = 0; j < clumps_combi[i].length; ++j)
+				if (coverage_valid[i][j] && alignability[i][j] > 0.5 &&
+						// clumps_combi[i][j] > 0. && avg_clumps_combi[i][j] > 0.)
+						avg_clumps_combi[i][j] > 0.1 && clumps_combi[i][j] < 4*avg_clumps_combi[i][j]) {
+					++top;
 				}
-			}
-			
-			execute(threads_factor,30);
-			
-			double sum_max=-Double.MAX_VALUE;
-			double factor_max1=0;//0.65;
-			double factor_max2=0;//0.65;
-			for (int i=0;i<threads_factor.length;i++){
-				for (int j=0;j<threads_factor[i].length;j++){
-					if(threads_factor[i][j].sum>sum_max){
-						sum_max=threads_factor[i][j].sum;
-						factor_max1=threads_factor[i][j].factor1;
-						factor_max2=threads_factor[i][j].factor2;
-						
-					}
+
+		double[] x = new double[top];
+		double[] m = new double[top];
+
+		top = 0;
+		for (int i = 0; i < clumps_combi.length; ++i)
+			for (int j = 0; j < clumps_combi[i].length; ++j)
+				if (coverage_valid[i][j] && alignability[i][j] > 0.5 &&
+						// clumps_combi[i][j] > 0. && avg_clumps_combi[i][j] > 0.) {
+						avg_clumps_combi[i][j] > 0.1 && clumps_combi[i][j] < 4*avg_clumps_combi[i][j]) {
+					x[top] = clumps_combi[i][j];
+					m[top] = avg_clumps_combi[i][j];
+					++top;
 				}
-			}
-			System.out.println("Max Factor Step 1	"+factor_max1+"	"+factor_max2);
-			
-			
-			threads_factor=new ThreadTestFactor[21][21];
-			for (int i=0;i<threads_factor.length;i++){
-				for (int j=0;j<threads_factor[i].length;j++){
-					threads_factor[i][j]=new ThreadTestFactor();
-					threads_factor[i][j].avg_clumps_combi=avg_clumps_combi;
-					threads_factor[i][j].clumps_combi=clumps_combi;
-					threads_factor[i][j].factor1=factor_max1-0.1+(double)(i)*0.01;
-					threads_factor[i][j].factor2=factor_max2-0.001+(double)(j)*0.0001;;
-					threads_factor[i][j].coverage_valid=coverage_valid;
-					//threads_factor[i][j].start();
-				}
-				
-			}
-			execute(threads_factor,30);
-			
-			sum_max=-Double.MAX_VALUE;
-			//factor_max1=0.65;
-			//factor_max2=0.65;
-			for (int i=0;i<threads_factor.length;i++){
-				for (int j=0;j<threads_factor[i].length;j++){
-					if(threads_factor[i][j].sum>sum_max){
-						sum_max=threads_factor[i][j].sum;
-						factor_max1=threads_factor[i][j].factor1;
-						factor_max2=threads_factor[i][j].factor2;
-					}
-					//System.out.println(threads_factor[i][j].factor1+"	"+threads_factor[i][j].factor2+"	"+threads_factor[i][j].sum);
-					
-				}
-				//System.out.println(threads_factor[i].factor+"	"+threads_factor[i].sum);
-				
-			}
-			System.out.println("Max Factor Step 2	"+factor_max1+"	"+factor_max2);
-			
-			//System.exit(0);
-			return new double[]{factor_max1,factor_max2};
-		}
-		
-		
-		
+
+		double[] F = new MaxFactor(MaxFactor.DTY_LOGT, MaxFactor.VAR_P12).solve(x, m, 100);
+		System.out.printf("Max Factor\t%g\t%g\n", F[0], F[1]);
+
+		return F;
 	}
 	
 	//Subthread to determine the distance between mutations (all mutations) to optimize weights in the cluster score
@@ -5037,53 +4926,6 @@ public class CombinedStatistics_100 {
 			status=2;
 		}
 		
-	}
-	
-	//Subthread to optimize factors to estimate the variance of the cluster scores based on their distribution average
-	private static class ThreadTestFactor extends Thread{
-		double[][] avg_clumps_combi=null;
-		double[][] clumps_combi=null;
-		boolean[][] coverage_valid=null;
-		double factor1=0;
-		double factor2=0;
-		double sum=0;
-		
-		int status=0;
-		public void run(){
-			status=1;
-			if(factor1<=0||factor2<=0){
-				sum=-Double.MAX_VALUE;
-				status=2;
-				return;
-			}
-			{
-				for (int i=0;i<clumps_combi.length;i++){
-					for (int j=0;j<clumps_combi[i].length;j++){
-						if(coverage_valid[i][j]){
-							
-							if(alignability[i][j]>0.5&&avg_clumps_combi[i][j]>0.1&&clumps_combi[i][j]<4*avg_clumps_combi[i][j]){
-								double avg_c=avg_clumps_combi[i][j];
-								double var_c=avg_clumps_combi[i][j]*factor1+avg_clumps_combi[i][j]*avg_clumps_combi[i][j]*factor2;
-								double alpha=avg_c*avg_c/var_c;
-								double beta=avg_c/var_c;
-								if(clumps_combi[i][j]==0||clumps_combi[i][j]==0){
-									
-								}
-								else{
-									sum+=gamma(clumps_combi[i][j],alpha,beta);	
-								}
-							}
-							
-							
-						}
-						
-						
-						
-					}
-				}
-			}
-			status=2;
-		}
 	}
 	
 	//Subthread to determine the expected and observed clustering score for each intervall (all mutations)
