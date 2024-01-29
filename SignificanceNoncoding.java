@@ -39,6 +39,8 @@ public class SignificanceNoncoding {
 	static String separator="/";
 	static String out_suffix="";
 	static ArrayList<java.util.regex.Pattern> disabled_tests=new ArrayList<java.util.regex.Pattern>();
+	static int do_significance = 0;   // NB. <1 ~ no, 0 ~ automatic, >1 ~ yes
+	static int do_combine = 0;
 
 	static boolean delete_intermediate=false;
 	
@@ -61,6 +63,18 @@ public class SignificanceNoncoding {
 				}
 				else if(args[i].equals("-disable_test")){
 					disabled_tests.add(globPattern(args[++i]));
+				}
+				else if(args[i].equals("-no_significance")){
+					do_significance=-1;
+				}
+				else if(args[i].equals("-always_significance")){
+					do_significance=+1;
+				}
+				else if(args[i].equals("-no_combine")){
+					do_combine=-1;
+				}
+				else if(args[i].equals("-always_combine")){
+					do_combine=+1;
 				}
 				else{
 					arg.add(args[i]);	
@@ -249,15 +263,21 @@ public class SignificanceNoncoding {
 			System.out.println("A");
 			
 			for (int i=0;i<4;i++){
-				System.out.println(i);
-				CombinedStatistics_10.execute(entity, i*2500, folder_auxiliary, folder_significance, folder_annotation, folder_counts_all,  all_entities, files_donors,  files_mut_snv,  files_mut_indel);				
+				if (do_significance == 0 ? !new File(folder_auxiliary + separator + "Significance" + separator + String.format("Significance_%s_%d.txt", entity, i*2500) + out_suffix).exists() : do_significance > 0){
+					System.out.println(i);
+					CombinedStatistics_10.execute(entity, i*2500, folder_auxiliary, folder_significance, folder_annotation, folder_counts_all,  all_entities, files_donors,  files_mut_snv,  files_mut_indel);
+				}
 			}
 			for (int i=0;i<4;i++){
-				System.out.println(i);
-				CombinedStatistics_100.execute(entity, i*25000, folder_auxiliary,  folder_significance, folder_annotation, folder_counts_all,  all_entities, files_donors, files_mut_snv,  files_mut_indel);
+				if (do_significance == 0 ? !new File(folder_auxiliary + separator + "Significance" + separator + String.format("Significance_100_%s_%d.txt", entity, i*25000) + out_suffix).exists() : do_significance > 0){
+					System.out.println(i);
+					CombinedStatistics_100.execute(entity, i*25000, folder_auxiliary,  folder_significance, folder_annotation, folder_counts_all,  all_entities, files_donors, files_mut_snv,  files_mut_indel);
+				}
 			}
 			
-			Combine_PValues_FDR.execute(entity, folder_annotation, folder_significance,  folder_auxiliary);
+			if (do_combine == 0 ? !new File(folder_auxiliary + separator + String.format("FDR_Weighted_Combined_%s.txt", entity) + out_suffix).exists() : do_combine > 0){
+				Combine_PValues_FDR.execute(entity, folder_annotation, folder_significance,  folder_auxiliary);
+			}
 		
 			if(delete_intermediate){
 				if(download_annotations){
