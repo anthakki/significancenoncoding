@@ -1456,10 +1456,20 @@ public class Combine_PValues_FDR {
 			
 			FileInputStream in=new FileInputStream(folder_significance+"Significance_"+entity+"_"+shift+".txt"+SignificanceNoncoding.out_suffix);
 			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
-			input.readLine();
+			String[] t_head = input.readLine().split("\t");
+			java.util.HashSet<Integer> disabled_inds = new java.util.HashSet<Integer>();
+			for (int k = 2; k < t_head.length; ++k)
+				for (java.util.regex.Pattern pattern : SignificanceNoncoding.disabled_tests)
+					if (pattern.matcher(t_head[k]).matches()) {
+						System.err.printf("disable \"%s\" index %d\n", t_head[k], k);
+						break;
+					}
 			String s="";
 			while((s=input.readLine())!=null){
 				String[] t=s.split("	");
+				for (int k : disabled_inds)
+					if (k != -1)
+						t[k] = "1.0";
 				for (int k=0;k<13;k++){
 					if(index(t[0],chr)==-1){
 						System.out.println(t[0]);
@@ -1776,10 +1786,20 @@ public class Combine_PValues_FDR {
 			
 			FileInputStream in=new FileInputStream(folder_significance+"Significance_100_"+entity+"_"+shift+".txt"+SignificanceNoncoding.out_suffix);
 			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
-			input.readLine();
+			String[] t_head = input.readLine().split("\t");
+			java.util.HashSet<Integer> disabled_inds = new java.util.HashSet<Integer>();
+			for (int k = 2; k < t_head.length; ++k)
+				for (java.util.regex.Pattern pattern : SignificanceNoncoding.disabled_tests)
+					if (pattern.matcher(t_head[k]).matches()) {
+						System.err.printf("disable \"%s\" index %d\n", t_head[k], k);
+						break;
+					}
 			String s="";
 			while((s=input.readLine())!=null){
 				String[] t=s.split("	");
+				for (int k : disabled_inds)
+					if (k != -1)
+						t[k] = "1.0";
 				for (int k=0;k<17;k++){
 					if(index(t[0],chr)==-1){
 						System.out.println(t[0]);

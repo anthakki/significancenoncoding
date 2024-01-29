@@ -2,9 +2,8 @@
 
 # default settings
 java_opts=()
-k_opt=''
-z_opt=''
 opts=()
+args=()
 jar_path="$0.jar"
 default_annotation_folder="$(dirname "$0")/AnnotationFilesComplete/"
 
@@ -12,29 +11,32 @@ default_annotation_folder="$(dirname "$0")/AnnotationFilesComplete/"
 while [ $# -gt 0 ]; do
 	case "$1" in
 		-cp|-classpath)
-			java_opts+=("$1")
-			java_opts+=("$2")
+			java_opts+=("$1" "$2")
 			shift
 			;;
 		-default_annotation_folder)
 			default_annotation_folder="$2"
 			shift
 			;;
+		-disable_test)
+			opts+=("$1" "$2")
+			shift
+			;;
 		-k)
-			k_opt="$1"
+			opts+=("$1")
 			;;
 		-jar_path)
 			jar_path="$2"
 			shift
 			;;
 		-z*)
-			z_opt="$1"
+			opts+=("$1")
 			;;
 		-*)
 			java_opts+=("$1")
 			;;
 		*)
-			opts+=("$1")
+			args+=("$1")
 			;;
 	esac
 	shift
@@ -47,13 +49,13 @@ usage() {
 }
 
 # check usage
-if   [ "${#opts[@]}" -eq 3 ]; then
-	opts+=("$default_annotation_folder")
-elif [ "${#opts[@]}" -eq 4 ]; then
+if   [ "${#args[@]}" -eq 3 ]; then
+	args+=("$default_annotation_folder")
+elif [ "${#args[@]}" -eq 4 ]; then
 	:
 else
 	usage
 fi
 
 # let's go..
-exec java "${java_opts[@]}" -jar "$jar_path" $k_opt $z_opt "${opts[@]}"
+exec java "${java_opts[@]}" -jar "$jar_path" "${opts[@]}" "${args[@]}"

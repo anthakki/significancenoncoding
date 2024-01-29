@@ -38,6 +38,7 @@ public class SignificanceNoncoding {
 	static String[] chr2={"1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24"};//,,"Y"
 	static String separator="/";
 	static String out_suffix="";
+	static ArrayList<java.util.regex.Pattern> disabled_tests=new ArrayList<java.util.regex.Pattern>();
 
 	static boolean delete_intermediate=false;
 	
@@ -57,6 +58,9 @@ public class SignificanceNoncoding {
 						ZipFilter.gzip_level=Integer.parseInt(level);
 					}
 					out_suffix=".gz";
+				}
+				else if(args[i].equals("-disable_test")){
+					disabled_tests.add(globPattern(args[++i]));
 				}
 				else{
 					arg.add(args[i]);	
@@ -424,5 +428,10 @@ public class SignificanceNoncoding {
 			}
 		}
 		return -1;
+	}
+
+	private static java.util.regex.Pattern globPattern(String pattern){
+		// NB. I guess not perfect but matches Pattern.quote()
+		return java.util.regex.Pattern.compile("^\\Q" + pattern.replace("*", "\\E.*\\Q").replace("?", "\\E.\\Q") + "\\E$");
 	}
 }
