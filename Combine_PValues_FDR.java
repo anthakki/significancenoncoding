@@ -183,7 +183,7 @@ public class Combine_PValues_FDR {
 	//to arrive at q-values for 10kb and 100kb intervalls. finally, it derives a combined genome-wide signal of significance by combining the FDR from 10kb and 100kb intervals
 	//that annotates a unique significance value to each position in the human genome
 	//based on this signal, it identifies significantly mutated regions (FDR<0.1) and annotates the closest gene
-	public static void execute(String entity, String folder_annotationX,  String folder_significanceX, String folder_auxiliaryX) throws java.io.IOException {
+	public static void execute(String entity, String folder_annotationX,  String folder_significanceX, String folder_auxiliaryX, java.util.Random rng) throws java.io.IOException {
 		boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
 		if(isWindows){
 			separator="\\";
@@ -222,13 +222,13 @@ public class Combine_PValues_FDR {
 			boolean[][][] coverage_valid=read_coverage_valid(new int[]{0,25000,50000,75000});
 			
 			
-			double[][][][] sign_fdr=read_sign_fdr(entity,max95,expression_available,coverage);
-			double[][][][] sign_fdr_100=read_sign_fdr_100(entity,max95,expression_available,coverage_valid);
+			double[][][][] sign_fdr=read_sign_fdr(entity,max95,expression_available,coverage, rng);
+			double[][][][] sign_fdr_100=read_sign_fdr_100(entity,max95,expression_available,coverage_valid, rng);
 			
 			double[][][] fdr_weight=sign_fdr[2];
 			double[][][] fdr_weight_100=sign_fdr_100[2];
 			
-			double[][] fdr_weight_combine=fdr_combine(fdr_weight, fdr_weight_100, new int[]{0,2500,5000,7500}, new int[]{0,25000,50000,75000});
+			double[][] fdr_weight_combine=fdr_combine(fdr_weight, fdr_weight_100, new int[]{0,2500,5000,7500}, new int[]{0,25000,50000,75000}, rng);
 	
 			{
 				int shift=0;
@@ -399,7 +399,7 @@ public class Combine_PValues_FDR {
 	
 	
 	//combine FDRs of 10kb and 100kb to a genome-wide signal of significance which annotates a single significance value to each position in the genome 
-	public static double[][] fdr_combine(double[][][] fdr_weight, double[][][] fdr_weight_100, int[] shift, int[] shift_100){
+	public static double[][] fdr_combine(double[][][] fdr_weight, double[][][] fdr_weight_100, int[] shift, int[] shift_100, java.util.Random rng){
 		
 		ArrayList<Sign2> significance=new ArrayList<Sign2>();
 		for (int k=0;k<shift.length;k++){
@@ -427,7 +427,7 @@ public class Combine_PValues_FDR {
 		};
 		
 		
-		Collections.shuffle(significance);
+		Collections.shuffle(significance, rng);
 		Collections.sort(significance,comp);
 		
 		int[][] given=new int[chr.length][];
@@ -740,7 +740,7 @@ public class Combine_PValues_FDR {
 	}
 	
 	//read significance for 10kb intervals, combine significance values for each interval, and perform weighted multiple hypothesis correction
-	public static double[][][][] read_sign_fdr(String entity, double[] max95, boolean expression_available, double[][][] coverage) throws java.io.IOException {
+	public static double[][][][] read_sign_fdr(String entity, double[] max95, boolean expression_available, double[][][] coverage, java.util.Random rng) throws java.io.IOException {
 		int[] shift1={0,2500,5000,7500};
 		int width=10000;
 		double[][][][] fdr=new double[shift1.length][][][];
@@ -755,7 +755,7 @@ public class Combine_PValues_FDR {
 	
 		for (int i=0;i<shift1.length;i++){
 			System.out.println(shift1[i]);
-			fdr[i]=fdr_weight(sign[i], max95, shift1[i], width,expression_available,coverage[i]);
+			fdr[i]=fdr_weight(sign[i], max95, shift1[i], width,expression_available,coverage[i], rng);
 		}
 		
 		double[][][] fdr_bh=new double[chr.length][][];
@@ -788,7 +788,7 @@ public class Combine_PValues_FDR {
 	}
 	
 	//read significance for 100kb intervals, combine significance values for each interval, and perform weighted multiple hypothesis correction
-	public static double[][][][] read_sign_fdr_100(String entity, double[] max95, boolean expression_available, boolean[][][] coverage_valid) throws java.io.IOException {
+	public static double[][][][] read_sign_fdr_100(String entity, double[] max95, boolean expression_available, boolean[][][] coverage_valid, java.util.Random rng) throws java.io.IOException {
 		int width=100000;
 		int[] shift2={0,25000,50000,75000};
 		
@@ -801,7 +801,7 @@ public class Combine_PValues_FDR {
 		double[][][][] fdr=new double[shift2.length][][][];
 		for (int i=0;i<shift2.length;i++){
 			System.out.println(shift2[i]);
-			fdr[i]=fdr_weight(sign[i], max95, shift2[i], width,expression_available,coverage_valid[i]);
+			fdr[i]=fdr_weight(sign[i], max95, shift2[i], width,expression_available,coverage_valid[i], rng);
 		}
 		
 		
@@ -945,7 +945,7 @@ public class Combine_PValues_FDR {
 	}
 
 	//perform weighted multiple hypothesis correction for 10kb intervals 
-	public static double[][][] fdr_weight(double[][] sign,  double[] max95, int shift, int width, boolean expression_available, double[][] coverage){	
+	public static double[][][] fdr_weight(double[][] sign,  double[] max95, int shift, int width, boolean expression_available, double[][] coverage, java.util.Random rng){
 		ArrayList<Integer>[][] index_gene=index_gene(shift, width);
 		
 		ArrayList<Sign> significance=new ArrayList<Sign>();
@@ -985,7 +985,7 @@ public class Combine_PValues_FDR {
 		};
 		
 		if(expression_available){
-			Collections.shuffle(significance);
+			Collections.shuffle(significance, rng);
 			Collections.sort(significance,comp_exp);
 			double[] thresholds_expr=new double[100-1];
 			for (int i=0;i<thresholds_expr.length;i++){
@@ -997,7 +997,7 @@ public class Combine_PValues_FDR {
 			}
 		}
 		
-		Collections.shuffle(significance);
+		Collections.shuffle(significance, rng);
 		Collections.sort(significance,comp_sign);
 		
 		for (int i=0;i<significance.size();i++){
@@ -1055,7 +1055,7 @@ public class Combine_PValues_FDR {
 			for (int i=0;i<significance.size();i++){
 				significance.get(i).p_weight=Math.min(1, significance.get(i).p/weight[significance.get(i).group]);
 			}
-			Collections.shuffle(significance);
+			Collections.shuffle(significance, rng);
 			Collections.sort(significance,comp_sign_weight);
 			for (int i=0;i<significance.size();i++){
 				significance.get(i).q_weight=Math.min(1, (double)(significance.size())/(double)(i+1)*significance.get(i).p_weight);
@@ -1086,7 +1086,7 @@ public class Combine_PValues_FDR {
 	}
 	
 	//perform weighted multiple hypothesis correction for 100kb intervals
-	public static double[][][] fdr_weight(double[][] sign,  double[] max95, int shift, int width, boolean expression_available, boolean[][] coverage_valid){	
+	public static double[][][] fdr_weight(double[][] sign,  double[] max95, int shift, int width, boolean expression_available, boolean[][] coverage_valid, java.util.Random rng){
 		ArrayList<Integer>[][] index_gene=index_gene(shift, width);
 		
 		ArrayList<Sign> significance=new ArrayList<Sign>();
@@ -1126,7 +1126,7 @@ public class Combine_PValues_FDR {
 		};
 		
 		if(expression_available){
-			Collections.shuffle(significance);
+			Collections.shuffle(significance, rng);
 			Collections.sort(significance,comp_exp);
 			double[] thresholds_expr=new double[100-1];
 			for (int i=0;i<thresholds_expr.length;i++){
@@ -1138,7 +1138,7 @@ public class Combine_PValues_FDR {
 			}
 		}
 		
-		Collections.shuffle(significance);
+		Collections.shuffle(significance, rng);
 		Collections.sort(significance,comp_sign);
 		
 		for (int i=0;i<significance.size();i++){
@@ -1196,7 +1196,7 @@ public class Combine_PValues_FDR {
 			for (int i=0;i<significance.size();i++){
 				significance.get(i).p_weight=Math.min(1, significance.get(i).p/weight[significance.get(i).group]);
 			}
-			Collections.shuffle(significance);
+			Collections.shuffle(significance, rng);
 			Collections.sort(significance,comp_sign_weight);
 			for (int i=0;i<significance.size();i++){
 				significance.get(i).q_weight=Math.min(1, (double)(significance.size())/(double)(i+1)*significance.get(i).p_weight);

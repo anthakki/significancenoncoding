@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
-import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.commons.math3.distribution.ChiSquaredDistribution;
@@ -183,7 +182,7 @@ public class CombinedStatistics_100 {
 	//compute epigenome-based p-values. In addition to p-values the method returns the counts in each interval.
 	//The method compares the observed number of mutations in each interval with the expected number of mutations based on the underlying epigenomic data.
 	//It computes p-values for 1kb, 10kb and 100kb intervals and summarizes p-values of neighboring 1kb and 10kb intervals using Tippett's method. 
-	public static double[][][][] sign_epigenomic(double[][][] chromatin_1000, double[][][] chromatin_10000, double[][][] chromatin_100000, int[][] count_1000, int[][] count_10000, int[][] count_100000, double[][] coverage, boolean[][] coverage_valid){//mutations,coverage
+	public static double[][][][] sign_epigenomic(double[][][] chromatin_1000, double[][][] chromatin_10000, double[][][] chromatin_100000, int[][] count_1000, int[][] count_10000, int[][] count_100000, double[][] coverage, boolean[][] coverage_valid, java.util.Random rng){//mutations,coverage
 		double[][] p_1000=p_1000(chromatin_1000,count_1000,coverage);
 		double[][] p_10000=p_10000(chromatin_10000,count_10000,coverage);
 		double[][] p_100000=p_100000(chromatin_100000,count_100000,coverage_valid);
@@ -209,9 +208,9 @@ public class CombinedStatistics_100 {
 			beta_gamma_100000=ab[1];
 		}
 		
-		SignCount count_sign_100000=sign_100000( chromatin_100000,  p_100000,  count_100000, alpha_gamma_100000, beta_gamma_100000,  coverage, coverage_valid);
-		SignCount count_sign_10000_min=sign_10000_min( chromatin_10000,  p_10000,  count_10000, alpha_gamma_10000, beta_gamma_10000,  coverage, coverage_valid);
-		SignCount count_sign_1000_min=sign_1000_min( chromatin_1000,  p_1000,  count_1000,  alpha_gamma_1000,  beta_gamma_1000,   coverage, coverage_valid);
+		SignCount count_sign_100000=sign_100000( chromatin_100000,  p_100000,  count_100000, alpha_gamma_100000, beta_gamma_100000,  coverage, coverage_valid, rng);
+		SignCount count_sign_10000_min=sign_10000_min( chromatin_10000,  p_10000,  count_10000, alpha_gamma_10000, beta_gamma_10000,  coverage, coverage_valid, rng);
+		SignCount count_sign_1000_min=sign_1000_min( chromatin_1000,  p_1000,  count_1000,  alpha_gamma_1000,  beta_gamma_1000,   coverage, coverage_valid, rng);
 		
 		double[][] sign_100000=count_sign_100000.sign;
 		double[][] sign_10000_min=count_sign_10000_min.sign;
@@ -246,7 +245,7 @@ public class CombinedStatistics_100 {
 	}
 	
 	//epigenomics based p-values for 100kb intervals
-	public static SignCount sign_100000(double[][][] chromatin_100000, double[][] p_100000,  int[][] count_100000, double[][] alpha_gamma_100000, double[][] beta_gamma_100000,  double[][] coverage, boolean[][] coverage_valid){//double[][]
+	public static SignCount sign_100000(double[][][] chromatin_100000, double[][] p_100000,  int[][] count_100000, double[][] alpha_gamma_100000, double[][] beta_gamma_100000,  double[][] coverage, boolean[][] coverage_valid, java.util.Random rng){//double[][]
 		
 		double[][] alpha_100000=new double[chr.length][]; 
 		double[][] beta_100000=new double[chr.length][]; 
@@ -296,7 +295,7 @@ public class CombinedStatistics_100 {
 							}
 						}
 						
-						double p=(p2-p1)*Math.random()+p1;
+						double p=(p2-p1)*rng.nextDouble()+p1;
 						alpha_100000[i][j]=alpha_gamma_100000[k_max][zz];
 						beta_100000[i][j]=beta_gamma_100000[k_max][zz];
 						if(k_max==0&&z==0){
@@ -429,7 +428,7 @@ public class CombinedStatistics_100 {
 							}
 						}
 						
-						sign_100000[i][j]=(p2-p1)*Math.random()+p1;
+						sign_100000[i][j]=(p2-p1)*rng.nextDouble()+p1;
 						if(Double.isNaN(sign_100000[i][j])){
 							sign_100000[i][j]=1;
 						}
@@ -447,7 +446,7 @@ public class CombinedStatistics_100 {
 	}
 	
 	//epigenomics based p-values for neighboring 10kb intervals, which are then summarized using Tippett's method
-	public static SignCount sign_10000_min(double[][][] chromatin_10000, double[][] p_10000,  int[][] count_10000, double[][] alpha_gamma_10000, double[][] beta_gamma_10000,  double[][] coverage, boolean[][] coverage_valid){//double[][]
+	public static SignCount sign_10000_min(double[][][] chromatin_10000, double[][] p_10000,  int[][] count_10000, double[][] alpha_gamma_10000, double[][] beta_gamma_10000,  double[][] coverage, boolean[][] coverage_valid, java.util.Random rng){//double[][]
 				
 		double[][] alpha_10000=new double[chr.length][]; 
 		double[][] beta_10000=new double[chr.length][]; 
@@ -497,7 +496,7 @@ public class CombinedStatistics_100 {
 							}
 						}
 						
-						double p=(p2-p1)*Math.random()+p1;
+						double p=(p2-p1)*rng.nextDouble()+p1;
 						alpha_10000[i][j]=alpha_gamma_10000[k_max][zz];
 						beta_10000[i][j]=beta_gamma_10000[k_max][zz];
 						if(k_max==0&&z==0){
@@ -629,7 +628,7 @@ public class CombinedStatistics_100 {
 							}
 						}
 						
-						sign_10000[i][j]=(p2-p1)*Math.random()+p1;
+						sign_10000[i][j]=(p2-p1)*rng.nextDouble()+p1;
 						if(Double.isNaN(sign_10000[i][j])){
 							sign_10000[i][j]=1;
 						}
@@ -704,7 +703,7 @@ public class CombinedStatistics_100 {
 	}
 	
 	//epigenomics based p-values for neighboring 1kb intervals, which are then summarized using Tippett's method
-	public static SignCount sign_1000_min(double[][][] chromatin_1000, double[][] p_1000,  int[][] count_1000, double[][] alpha_gamma_1000, double[][] beta_gamma_1000,  double[][] coverage, boolean[][] coverage_valid){//double[][]
+	public static SignCount sign_1000_min(double[][][] chromatin_1000, double[][] p_1000,  int[][] count_1000, double[][] alpha_gamma_1000, double[][] beta_gamma_1000,  double[][] coverage, boolean[][] coverage_valid, java.util.Random rng){//double[][]
 		double[][] alpha_1000=new double[chr.length][]; 
 		double[][] beta_1000=new double[chr.length][]; 
 		for (int i=0;i<chr.length;i++){
@@ -753,7 +752,7 @@ public class CombinedStatistics_100 {
 							p2=1-cum_gamma_poisson(count_1000[i][j]-2,alpha_gamma_1000[k_max][zz],beta_gamma_1000[k_max][zz]);
 						}
 					}
-					double p=(p2-p1)*Math.random()+p1;
+					double p=(p2-p1)*rng.nextDouble()+p1;
 					alpha_1000[i][j]=alpha_gamma_1000[k_max][zz];
 					beta_1000[i][j]=beta_gamma_1000[k_max][zz];
 					
@@ -887,7 +886,7 @@ public class CombinedStatistics_100 {
 							}
 						}
 						
-						sign_1000[i][j]=(p2-p1)*Math.random()+p1;
+						sign_1000[i][j]=(p2-p1)*rng.nextDouble()+p1;
 						if(Double.isNaN(sign_1000[i][j])){
 							sign_1000[i][j]=1;
 						}
@@ -2042,7 +2041,7 @@ public class CombinedStatistics_100 {
 	//paths and global parameters based on outside parameters. it then reads mutations and annotation data
 	//and calls the functions to compute the different p-values for each 100kb interval described in the methods
 	//finally, it writes these p-values to a combined significance file
-	public static void execute(String entity_sel, int shift_mut, String folder_auxiliary, String folder_significance,String folder_annotation,String folder_counts_all, String[] all_entities, String[][] files_donors, String[][][] files_mut_snv, String[][][] files_mut_indel) throws java.io.IOException {
+	public static void execute(String entity_sel, int shift_mut, String folder_auxiliary, String folder_significance,String folder_annotation,String folder_counts_all, String[] all_entities, String[][] files_donors, String[][][] files_mut_snv, String[][][] files_mut_indel, java.util.Random rng) throws java.io.IOException {
 		boolean isWindows = System.getProperty("os.name").toLowerCase().startsWith("windows");
 		if(isWindows){
 			separator="\\";
@@ -2294,6 +2293,8 @@ public class CombinedStatistics_100 {
 			
 			
 			double[] factor_clumps=new double[10000];
+			{
+				long seeds[] = SignificanceNoncoding.Random_nextLongs(rng, chr.length);
 			if(!new File(file_factor_clumps).exists()){
 				
 				SubthreadClumpsDistance[] threads_dist=new SubthreadClumpsDistance[chr.length];
@@ -2303,6 +2304,7 @@ public class CombinedStatistics_100 {
 					threads_dist[i].coverage_valid=coverage_valid;
 					threads_dist[i].table_skip=table_skip[i];
 					threads_dist[i].mutations=mutations;
+					threads_dist[i].seed=seeds[i];
 					threads_dist[i].start();
 				}
 				
@@ -2368,10 +2370,13 @@ public class CombinedStatistics_100 {
 				}
 				input.close();			
 			}
+			}
 			
 			double[][] clumps_combi=new double[chr.length][];
 			double[][] avg_clumps_combi=new double[chr.length][];
 			
+			{
+				long seeds[] = SignificanceNoncoding.Random_nextLongs(rng, chr.length);
 			if(!new File(file_clumps_count_combi).exists()){
 				SubthreadClumpsCombi[] threads_combi=new SubthreadClumpsCombi[chr.length];
 				for (int i=0;i<threads_combi.length;i++){
@@ -2380,6 +2385,7 @@ public class CombinedStatistics_100 {
 					threads_combi[i].coverage_valid=coverage_valid;
 					threads_combi[i].mutations=mutations;
 					threads_combi[i].factor_clumps=factor_clumps;
+					threads_combi[i].seed=seeds[i];
 					threads_combi[i].start();
 				}
 				
@@ -2431,6 +2437,7 @@ public class CombinedStatistics_100 {
 					
 				}
 				input.close();
+			}
 			}
 			
 			double max_factor_combi1=0;
@@ -2520,6 +2527,8 @@ public class CombinedStatistics_100 {
 			
 			
 			double[] factor_clumps_indel=new double[10000];
+			{
+				long seeds[] = SignificanceNoncoding.Random_nextLongs(rng, chr.length);
 			if(!new File(file_factor_clumps_indel).exists()){
 				
 				SubthreadClumpsDistance_indel[] threads_dist_indel=new SubthreadClumpsDistance_indel[chr.length];
@@ -2529,6 +2538,7 @@ public class CombinedStatistics_100 {
 					threads_dist_indel[i].coverage_valid=coverage_valid;
 					threads_dist_indel[i].table_skip=table_skip_indel[i];
 					threads_dist_indel[i].mutations=mutations;
+					threads_dist_indel[i].seed=seeds[i];
 					threads_dist_indel[i].start();
 				}
 				
@@ -2594,10 +2604,13 @@ public class CombinedStatistics_100 {
 				}
 				input.close();			
 			}
+			}
 			
 			double[][] clumps_combi_indel=new double[chr.length][];
 			double[][] avg_clumps_combi_indel=new double[chr.length][];
 			
+			{
+				long seeds[] = SignificanceNoncoding.Random_nextLongs(rng, chr.length);
 			if(!new File(file_clumps_count_combi_indel).exists()){
 				SubthreadClumpsCombi_indel[] threads_combi_indel=new SubthreadClumpsCombi_indel[chr.length];
 				for (int i=0;i<threads_combi_indel.length;i++){
@@ -2606,6 +2619,7 @@ public class CombinedStatistics_100 {
 					threads_combi_indel[i].coverage_valid=coverage_valid;
 					threads_combi_indel[i].mutations=mutations;
 					threads_combi_indel[i].factor_clumps=factor_clumps_indel;
+					threads_combi_indel[i].seed=seeds[i];
 					threads_combi_indel[i].start();
 				}
 				
@@ -2658,6 +2672,7 @@ public class CombinedStatistics_100 {
 				}
 				input.close();
 			}
+			}
 			
 			double max_factor_combi_indel1=0;
 			double max_factor_combi_indel2=0;
@@ -2706,8 +2721,10 @@ public class CombinedStatistics_100 {
 			}
 			
 			double[][][] p_indel=null;
+			{
+				long seed = rng.nextLong();
 			if(!new File(file_p_indel).exists()||!new File(file_count_indel1).exists()||!new File(file_count_indel2).exists()||!new File(file_count_indel3).exists()){
-				double[][][][] xxxx=read_counts_all_entities(file_n_indel_quality2,entity_sel,coverage,coverage_valid, file_ww_indel, file_ww_10_indel, file_ww_100_indel);
+				double[][][][] xxxx=read_counts_all_entities(file_n_indel_quality2,entity_sel,coverage,coverage_valid, file_ww_indel, file_ww_10_indel, file_ww_100_indel, new java.util.Random(seed));
 				p_indel=xxxx[0];
 				double[][][] count_indel1=xxxx[0+1];
 				double[][][] count_indel2=xxxx[1+1];
@@ -2772,11 +2789,14 @@ public class CombinedStatistics_100 {
 				}
 				input.close();
 			}
+			}
 			
 			double[][][] p_combi=null;
+			{
+				long seed = rng.nextLong();
 			if(!new File(file_p_combi).exists()||!new File(file_count_combi1).exists()||!new File(file_count_combi2).exists()||!new File(file_count_combi3).exists()){
 				
-				double[][][][] xxxx=read_counts_all_entities(file_n_quality2,entity_sel,coverage,coverage_valid,file_ww_combi, file_ww_10_combi, file_ww_100_combi);//null;//	//n_snv2_quality	//Lung
+				double[][][][] xxxx=read_counts_all_entities(file_n_quality2,entity_sel,coverage,coverage_valid,file_ww_combi, file_ww_10_combi, file_ww_100_combi, new java.util.Random(seed));//null;//	//n_snv2_quality	//Lung
 				p_combi=xxxx[0];
 				double[][][] count_combi1=xxxx[0+1];
 				double[][][] count_combi2=xxxx[1+1];
@@ -2841,7 +2861,7 @@ public class CombinedStatistics_100 {
 				}
 				input.close();
 			}
-
+			}
 			
 			double[][][] chromatin_1000=read_chromatin_1000(); 
 			double[][][] chromatin_10000=read_chromatin_10000(); 
@@ -2849,12 +2869,14 @@ public class CombinedStatistics_100 {
 			
 			
 			double[][][] sign_epigenomic_combi=null;
+			{
+				long seed = rng.nextLong();
 			if(!new File(file_p_epigenomic_combi).exists()||!new File(file_count_epigenomic_combi1).exists()||!new File(file_count_epigenomic_combi2).exists()||!new File(file_count_epigenomic_combi3).exists()){
 				int[][] count_1000=count_1000(mutations); 
 				int[][] count_10000=count_10000(mutations); 
 				int[][] count_100000=count_100000(mutations);
 				
-				double[][][][] xxxx=sign_epigenomic( chromatin_1000,  chromatin_10000,  chromatin_100000,  count_1000,  count_10000, count_100000,  coverage, coverage_valid);
+				double[][][][] xxxx=sign_epigenomic( chromatin_1000,  chromatin_10000,  chromatin_100000,  count_1000,  count_10000, count_100000,  coverage, coverage_valid, new java.util.Random(seed));
 				
 				sign_epigenomic_combi=xxxx[0];
 				double[][][] count_epigenomic_combi1=xxxx[0+1];
@@ -2919,15 +2941,17 @@ public class CombinedStatistics_100 {
 				}
 				input.close();
 			}
+			}
 			
 			
 			double[][][] sign_epigenomic_indel=null;
+			{
 			if(!new File(file_p_epigenomic_indel).exists()||!new File(file_count_epigenomic_indel1).exists()||!new File(file_count_epigenomic_indel2).exists()||!new File(file_count_epigenomic_indel3).exists()){
 				int[][] count_1000_indel=count_1000_indel(mutations);
 				int[][] count_10000_indel=count_10000_indel(mutations);
 				int[][] count_100000_indel=count_100000_indel(mutations);
 				
-				double[][][][] xxxx=sign_epigenomic( chromatin_1000,  chromatin_10000, chromatin_100000, count_1000_indel,  count_10000_indel, count_100000_indel, coverage, coverage_valid);
+				double[][][][] xxxx=sign_epigenomic( chromatin_1000,  chromatin_10000, chromatin_100000, count_1000_indel,  count_10000_indel, count_100000_indel, coverage, coverage_valid, rng);
 				sign_epigenomic_indel=xxxx[0];
 				double[][][] count_epigenomic_indel1=xxxx[0+1];
 				double[][][] count_epigenomic_indel2=xxxx[1+1];
@@ -2990,6 +3014,7 @@ public class CombinedStatistics_100 {
 					sign_epigenomic_indel[Integer.parseInt(t[0])][Integer.parseInt(t[1])][2]=Double.parseDouble(t[4]);
 				}
 				input.close();
+			}
 			}
 
 			int[][] count_mut=new int[chr.length][];
@@ -3069,7 +3094,7 @@ public class CombinedStatistics_100 {
 							
 							p1_bin=Math.pow(new PoissonDistribution(count_mut[i][j]/eligible).cumulativeProbability(max_mut[i][j]-1),eligible-1)*new PoissonDistribution(count_mut[i][j]*f_max/eligible).cumulativeProbability(max_mut[i][j]-1);
 							p2_bin=Math.pow(new PoissonDistribution(count_mut[i][j]/eligible).cumulativeProbability(max_mut[i][j]-2),eligible-1)*new PoissonDistribution(count_mut[i][j]*f_max/eligible).cumulativeProbability(max_mut[i][j]-2);
-							p_hotspot[i][j]=1-(Math.random()*(p2_bin-p1_bin)+p1_bin);
+							p_hotspot[i][j]=1-(rng.nextDouble()*(p2_bin-p1_bin)+p1_bin);
 							
 						}
 					}
@@ -3284,7 +3309,7 @@ public class CombinedStatistics_100 {
 	//for this purpose, the method first reads the counts from all cancer types and esitmates the number of mutations 
 	//in each interval based on similarity. based on this estimate, the method computes count-based p-values using a Gamma-Poisson distribution
 	//for 1kb, 10kb and 100kb intervals. it then combines p-values of neighboring 1kb and 10kb intervals using Tippett's method 
-	public static double[][][][] read_counts_all_entities(String file_count,String entity_sel, double[][] coverage, boolean[][] coverage_valid, String file_ww, String file_ww_10, String file_ww_100) throws java.io.IOException {
+	public static double[][][][] read_counts_all_entities(String file_count,String entity_sel, double[][] coverage, boolean[][] coverage_valid, String file_ww, String file_ww_10, String file_ww_100, java.util.Random rng) throws java.io.IOException {
 		double[][][] p_result=new double[chr.length][][];
 		int ll=1000;
 		{
@@ -3864,7 +3889,7 @@ public class CombinedStatistics_100 {
 								}
 							}
 							
-							pp2C[i][j]=(pp2B-pp2A)*Math.random()+pp2A;
+							pp2C[i][j]=(pp2B-pp2A)*rng.nextDouble()+pp2A;
 							
 						}
 						else{
@@ -4073,7 +4098,7 @@ public class CombinedStatistics_100 {
 								}
 							}
 							
-							pp2_10C[i][j]=(pp2_10B-pp2_10A)*Math.random()+pp2_10A;
+							pp2_10C[i][j]=(pp2_10B-pp2_10A)*rng.nextDouble()+pp2_10A;
 							
 							if(Double.isNaN(pp2_10C[i][j])){
 								System.out.println(chr[i]+"	"+(j*10000));
@@ -4302,7 +4327,7 @@ public class CombinedStatistics_100 {
 								 }
 							}
 							
-							pp2_100C[i][j]=(pp2_100B-pp2_100A)*Math.random()+pp2_100A;
+							pp2_100C[i][j]=(pp2_100B-pp2_100A)*rng.nextDouble()+pp2_100A;
 							
 							if(Double.isNaN(pp2_100C[i][j])){
 								System.out.println(chr[i]+"	"+(j*10000));
@@ -4848,10 +4873,11 @@ public class CombinedStatistics_100 {
 		Hashtable<Integer,Integer> table_skip=null;
 		int[] observed=new int[10000];
 		int[] expected=new int[10000];
+		long seed;
 		
 		public void run(){
 			status=1;
-			ThreadLocalRandom random=ThreadLocalRandom.current();
+			java.util.Random random=new java.util.Random(seed);
 			
 			{
 				
@@ -4893,10 +4919,11 @@ public class CombinedStatistics_100 {
 		Hashtable<Integer,Integer> table_skip=null;
 		int[] observed=new int[10000];
 		int[] expected=new int[10000];
+		long seed;
 		
 		public void run(){
 			status=1;
-			ThreadLocalRandom random=ThreadLocalRandom.current();
+			java.util.Random random=new java.util.Random(seed);
 			
 			{
 				
@@ -4938,10 +4965,11 @@ public class CombinedStatistics_100 {
 		double[] clumps=null;
 		double[] factor_clumps=null;
 		ArrayList<Mutation>[][] mutations=null;
+		long seed;
 		
 		public void run(){
 			status=1;
-			ThreadLocalRandom random=ThreadLocalRandom.current();
+			java.util.Random random=new java.util.Random(seed);
 			
 			{
 				
@@ -4991,10 +5019,11 @@ public class CombinedStatistics_100 {
 		double[] clumps=null;
 		double[] factor_clumps=null;
 		ArrayList<Mutation>[][] mutations=null;
+		long seed;
 		
 		public void run(){
 			status=1;
-			ThreadLocalRandom random=ThreadLocalRandom.current();
+			java.util.Random random=new java.util.Random(seed);
 			
 			{
 				
@@ -5310,7 +5339,7 @@ public class CombinedStatistics_100 {
 	}
 	
 	//function for simulation of positions of mutations
-	public static int select(ArrayList<int[]> interval, ThreadLocalRandom random){
+	public static int select(ArrayList<int[]> interval, java.util.Random random){
 		int l=0;
 		for (int i=0;i<interval.size();i++){
 			l+=interval.get(i)[1]-interval.get(i)[0];

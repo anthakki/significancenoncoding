@@ -43,6 +43,16 @@ public class SignificanceNoncoding {
 	static int do_combine = 0;
 
 	static boolean delete_intermediate=false;
+
+	private static java.util.Random rng = new java.util.Random();
+
+	public static long[] Random_nextLongs(java.util.Random rng, int count) {
+		long[] values = new long[count];
+		for (int i = 0; i < count; ++i)
+			values[i] = rng.nextLong();
+
+		return values;
+	}
 	
 	//parse arguments of the method and decide whether annotation files need to be downloaded
 	public static void main(String[] args){
@@ -75,6 +85,9 @@ public class SignificanceNoncoding {
 				}
 				else if(args[i].equals("-always_combine")){
 					do_combine=+1;
+				}
+				else if(args[i].startsWith("-seed=")){
+					rng = new java.util.Random(Long.parseLong(args[i].substring("-seed=".length())));
 				}
 				else{
 					arg.add(args[i]);	
@@ -262,21 +275,30 @@ public class SignificanceNoncoding {
 			} // !input_done
 			System.out.println("A");
 			
+			{
+				long seeds[] = Random_nextLongs(rng, 4);
 			for (int i=0;i<4;i++){
 				if (do_significance == 0 ? !new File(folder_auxiliary + separator + "Significance" + separator + String.format("Significance_%s_%d.txt", entity, i*2500) + out_suffix).exists() : do_significance > 0){
 					System.out.println(i);
-					CombinedStatistics_10.execute(entity, i*2500, folder_auxiliary, folder_significance, folder_annotation, folder_counts_all,  all_entities, files_donors,  files_mut_snv,  files_mut_indel);
+					CombinedStatistics_10.execute(entity, i*2500, folder_auxiliary, folder_significance, folder_annotation, folder_counts_all,  all_entities, files_donors,  files_mut_snv,  files_mut_indel, new java.util.Random(seeds[i]));
 				}
 			}
+			}
+			{
+				long seeds[] = Random_nextLongs(rng, 4);
 			for (int i=0;i<4;i++){
 				if (do_significance == 0 ? !new File(folder_auxiliary + separator + "Significance" + separator + String.format("Significance_100_%s_%d.txt", entity, i*25000) + out_suffix).exists() : do_significance > 0){
 					System.out.println(i);
-					CombinedStatistics_100.execute(entity, i*25000, folder_auxiliary,  folder_significance, folder_annotation, folder_counts_all,  all_entities, files_donors, files_mut_snv,  files_mut_indel);
+					CombinedStatistics_100.execute(entity, i*25000, folder_auxiliary,  folder_significance, folder_annotation, folder_counts_all,  all_entities, files_donors, files_mut_snv,  files_mut_indel, new java.util.Random(seeds[i]));
 				}
 			}
+			}
 			
+			{
+				long seed = rng.nextLong();
 			if (do_combine == 0 ? !new File(folder_auxiliary + separator + String.format("FDR_Weighted_Combined_%s.txt", entity) + out_suffix).exists() : do_combine > 0){
-				Combine_PValues_FDR.execute(entity, folder_annotation, folder_significance,  folder_auxiliary);
+				Combine_PValues_FDR.execute(entity, folder_annotation, folder_significance,  folder_auxiliary, new java.util.Random(seed));
+			}
 			}
 		
 			if(delete_intermediate){
