@@ -2036,6 +2036,86 @@ public class CombinedStatistics_100 {
 		files_mut_indel=files_mut_indelX;
 		
 	}
+
+	private static int mask_index(String what) {
+		final String names[] = { "p_splice", "p_clumps_combi", "p_clumps_combi_indel",
+			"p_indel_min_10fold", "p_indel_min_100fold", "p_indel_large",
+			"p_combi_min_10fold", "p_combi_min_100fold", "p_combi_large",
+			"sign_epigenomic_combi_large", "sign_epigenomic_combi_min_10fold",
+			"sign_epigenomic_combi_min_100fold",
+			"sign_epigenomic_indel_large", "sign_epigenomic_indel_min_10fold",
+			"sign_epigenomic_indel_min_100fold",
+			"p_hotspot", "p_destructive" };
+		return index(what, names);
+	}
+
+	private static void mask_clumps(boolean[][][] p_mask, double[][] clumps, double[][] clumps_avg, int k) {
+		// from Combine_PValues_FDR..
+		for (int i = 0; i < p_mask.length; ++i)
+			for (int j = 0; j < p_mask[i].length; ++j)
+				if (clumps[i][j] > 2.5 * clumps_avg[i][j] && clumps_avg[i][j] > 1)
+					;
+				else
+					p_mask[i][j][k] = true;
+	}
+
+	private static void mask_clumps(boolean[][][] p_mask, double[][] clumps, double[][] clumps_avg, String what) {
+		mask_clumps(p_mask, clumps, clumps_avg, mask_index(what));
+	}
+
+	private static void mask_counts(boolean[][][] p_mask, double[][][] count, int k, int dim) {
+		// from Combine_PValues_FDR..
+		final double[] threshold_count_100 = { -1, -1, -1, 1, 1, 1, 8, 6, 20, 20, 8, 6, 1, 1, 1, -1, -1 };
+		final int col = 0;
+		final int w = 100000 / dim;
+
+		for (int i = 0; i < p_mask.length; ++i)
+		{
+			assert p_mask[i].length == ( count[i].length - 1 ) / w + 1;
+
+			for (int j = 0; j < p_mask[i].length; ++j)
+			{
+				double max_count = count[i][w*j][col];
+
+				for (int j1 = 1; j1 < Math.min(w, count[i].length - w*j); ++j1)
+					if (count[i][w*j+j1][col] > max_count)
+						max_count = count[i][w*j+j1][col];
+
+				if (max_count > threshold_count_100[k])
+					;
+				else
+					p_mask[i][j][k] = true;
+			}
+		}
+	}
+
+	private static void mask_counts(boolean[][][] p_mask, double[][][] count, String what, int dim) {
+		mask_counts(p_mask, count, mask_index(what), dim);
+	}
+
+	private static double[][][] read_count_dump(String file, int dim, int vars) throws java.io.IOException {
+		FileInputStream in = new FileInputStream(file);
+		BufferedReader input = new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
+
+		double[][][] counts = new double[chr.length][][];
+		for (int i = 0; i < chr.length; ++i)
+			counts[i] = new double[1+(chr_length[i]-shift_mut)/dim][vars];
+
+		for (String s; (s = input.readLine()) != null;) {
+			String[] t = s.split("\t");
+			for (int k = 0; k < t.length - 2; ++k)
+				counts[Integer.parseInt(t[0])][Integer.parseInt(t[1])][k] = Double.parseDouble(t[2+k]);
+		}
+
+		input.close();
+
+		return counts;
+	}
+
+	private static String format_p_mask(double p_value, boolean mask) {
+		assert !( p_value < 0. && !mask );   // NB. not decodable
+		return ( !mask && !( p_value < 0. ) ? "+" : "" ) + p_value;
+	}
 	
 	//main function called from outside to execute the script. the script first initializes the 
 	//paths and global parameters based on outside parameters. it then reads mutations and annotation data
@@ -2371,6 +2451,10 @@ public class CombinedStatistics_100 {
 				input.close();			
 			}
 			}
+
+			boolean[][][] p_mask = new boolean[chr.length][][];
+			for (int i = 0; i < p_mask.length; ++i)
+				p_mask[i] = new boolean[1+(chr_length[i]-shift_mut)/100000][17];
 			
 			double[][] clumps_combi=new double[chr.length][];
 			double[][] avg_clumps_combi=new double[chr.length][];
@@ -2438,6 +2522,9 @@ public class CombinedStatistics_100 {
 				}
 				input.close();
 			}
+			}
+			{
+				mask_clumps(p_mask, clumps_combi, avg_clumps_combi, "p_clumps_combi");
 			}
 			
 			double max_factor_combi1=0;
@@ -2673,6 +2760,9 @@ public class CombinedStatistics_100 {
 				input.close();
 			}
 			}
+			{
+				mask_clumps(p_mask, clumps_combi_indel, avg_clumps_combi_indel, "p_clumps_combi_indel");
+			}
 			
 			double max_factor_combi_indel1=0;
 			double max_factor_combi_indel2=0;
@@ -2722,13 +2812,16 @@ public class CombinedStatistics_100 {
 			
 			double[][][] p_indel=null;
 			{
+				double[][][] count_indel1;
+				double[][][] count_indel2;
+				double[][][] count_indel3;
 				long seed = rng.nextLong();
 			if(!new File(file_p_indel).exists()||!new File(file_count_indel1).exists()||!new File(file_count_indel2).exists()||!new File(file_count_indel3).exists()){
 				double[][][][] xxxx=read_counts_all_entities(file_n_indel_quality2,entity_sel,coverage,coverage_valid, file_ww_indel, file_ww_10_indel, file_ww_100_indel, new java.util.Random(seed));
 				p_indel=xxxx[0];
-				double[][][] count_indel1=xxxx[0+1];
-				double[][][] count_indel2=xxxx[1+1];
-				double[][][] count_indel3=xxxx[2+1];
+				count_indel1=xxxx[0+1];
+				count_indel2=xxxx[1+1];
+				count_indel3=xxxx[2+1];
 				
 				
 				java.io.FileOutputStream out=new java.io.FileOutputStream(file_p_indel);
@@ -2774,6 +2867,10 @@ public class CombinedStatistics_100 {
 				
 			}
 			else{
+				count_indel1 = read_count_dump(file_count_indel1, 10000, 3);
+				count_indel2 = read_count_dump(file_count_indel2, 100000, 3);
+				count_indel3 = read_count_dump(file_count_indel3, 1000, 3);
+
 				p_indel=new double[chr.length][][];
 				for (int i=0;i<chr.length;i++){
 					p_indel[i]=new double[1+(chr_length[i]-shift_mut)/100000][3];
@@ -2789,18 +2886,26 @@ public class CombinedStatistics_100 {
 				}
 				input.close();
 			}
+			{
+				mask_counts(p_mask, count_indel1, "p_indel_min_10fold", 10000);
+				mask_counts(p_mask, count_indel3, "p_indel_min_100fold", 1000);
+				mask_counts(p_mask, count_indel2, "p_indel_large", 100000);
+			}
 			}
 			
 			double[][][] p_combi=null;
 			{
+				double[][][] count_combi1;
+        double[][][] count_combi2;
+        double[][][] count_combi3;
 				long seed = rng.nextLong();
 			if(!new File(file_p_combi).exists()||!new File(file_count_combi1).exists()||!new File(file_count_combi2).exists()||!new File(file_count_combi3).exists()){
 				
 				double[][][][] xxxx=read_counts_all_entities(file_n_quality2,entity_sel,coverage,coverage_valid,file_ww_combi, file_ww_10_combi, file_ww_100_combi, new java.util.Random(seed));//null;//	//n_snv2_quality	//Lung
 				p_combi=xxxx[0];
-				double[][][] count_combi1=xxxx[0+1];
-				double[][][] count_combi2=xxxx[1+1];
-				double[][][] count_combi3=xxxx[2+1];
+				count_combi1=xxxx[0+1];
+				count_combi2=xxxx[1+1];
+				count_combi3=xxxx[2+1];
 				
 				java.io.FileOutputStream out=new java.io.FileOutputStream(file_p_combi);
 				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_p_combi)));
@@ -2846,6 +2951,10 @@ public class CombinedStatistics_100 {
 				
 			}
 			else{
+				count_combi1 = read_count_dump(file_count_combi1, 10000, 3);
+				count_combi2 = read_count_dump(file_count_combi2, 100000, 3);
+				count_combi3 = read_count_dump(file_count_combi3, 1000, 3);
+
 				p_combi=new double[chr.length][][];
 				for (int i=0;i<chr.length;i++){
 					p_combi[i]=new double[1+(chr_length[i]-shift_mut)/100000][3];
@@ -2861,6 +2970,11 @@ public class CombinedStatistics_100 {
 				}
 				input.close();
 			}
+			{
+				mask_counts(p_mask, count_combi1, "p_combi_min_10fold", 10000);
+				mask_counts(p_mask, count_combi3, "p_combi_min_100fold", 1000);
+				mask_counts(p_mask, count_combi2, "p_combi_large", 100000);
+			}
 			}
 			
 			double[][][] chromatin_1000=read_chromatin_1000(); 
@@ -2870,6 +2984,9 @@ public class CombinedStatistics_100 {
 			
 			double[][][] sign_epigenomic_combi=null;
 			{
+				double[][][] count_epigenomic_combi1;
+        double[][][] count_epigenomic_combi2;
+        double[][][] count_epigenomic_combi3;
 				long seed = rng.nextLong();
 			if(!new File(file_p_epigenomic_combi).exists()||!new File(file_count_epigenomic_combi1).exists()||!new File(file_count_epigenomic_combi2).exists()||!new File(file_count_epigenomic_combi3).exists()){
 				int[][] count_1000=count_1000(mutations); 
@@ -2879,9 +2996,9 @@ public class CombinedStatistics_100 {
 				double[][][][] xxxx=sign_epigenomic( chromatin_1000,  chromatin_10000,  chromatin_100000,  count_1000,  count_10000, count_100000,  coverage, coverage_valid, new java.util.Random(seed));
 				
 				sign_epigenomic_combi=xxxx[0];
-				double[][][] count_epigenomic_combi1=xxxx[0+1];
-				double[][][] count_epigenomic_combi2=xxxx[1+1];
-				double[][][] count_epigenomic_combi3=xxxx[2+1];
+				count_epigenomic_combi1=xxxx[0+1];
+				count_epigenomic_combi2=xxxx[1+1];
+				count_epigenomic_combi3=xxxx[2+1];
 				
 				java.io.FileOutputStream out=new java.io.FileOutputStream(file_p_epigenomic_combi);
 				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_p_epigenomic_combi)));
@@ -2926,6 +3043,10 @@ public class CombinedStatistics_100 {
 			
 			}
 			else{
+				count_epigenomic_combi1 = read_count_dump(file_count_epigenomic_combi1, 100000, 3);
+				count_epigenomic_combi2 = read_count_dump(file_count_epigenomic_combi2, 10000, 3);
+				count_epigenomic_combi3 = read_count_dump(file_count_epigenomic_combi3, 1000, 3);
+
 				sign_epigenomic_combi=new double[chr.length][][];
 				for (int i=0;i<chr.length;i++){
 					sign_epigenomic_combi[i]=new double[1+(chr_length[i]-shift_mut)/100000][3];
@@ -2941,11 +3062,19 @@ public class CombinedStatistics_100 {
 				}
 				input.close();
 			}
+			{
+				mask_counts(p_mask, count_epigenomic_combi1, "sign_epigenomic_combi_large", 100000);
+				mask_counts(p_mask, count_epigenomic_combi2, "sign_epigenomic_combi_min_10fold", 10000);
+				mask_counts(p_mask, count_epigenomic_combi3, "sign_epigenomic_combi_min_100fold", 1000);
+			}
 			}
 			
 			
 			double[][][] sign_epigenomic_indel=null;
 			{
+				double[][][] count_epigenomic_indel1;
+        double[][][] count_epigenomic_indel2;
+        double[][][] count_epigenomic_indel3;
 			if(!new File(file_p_epigenomic_indel).exists()||!new File(file_count_epigenomic_indel1).exists()||!new File(file_count_epigenomic_indel2).exists()||!new File(file_count_epigenomic_indel3).exists()){
 				int[][] count_1000_indel=count_1000_indel(mutations);
 				int[][] count_10000_indel=count_10000_indel(mutations);
@@ -2953,9 +3082,9 @@ public class CombinedStatistics_100 {
 				
 				double[][][][] xxxx=sign_epigenomic( chromatin_1000,  chromatin_10000, chromatin_100000, count_1000_indel,  count_10000_indel, count_100000_indel, coverage, coverage_valid, rng);
 				sign_epigenomic_indel=xxxx[0];
-				double[][][] count_epigenomic_indel1=xxxx[0+1];
-				double[][][] count_epigenomic_indel2=xxxx[1+1];
-				double[][][] count_epigenomic_indel3=xxxx[2+1];
+				count_epigenomic_indel1=xxxx[0+1];
+				count_epigenomic_indel2=xxxx[1+1];
+				count_epigenomic_indel3=xxxx[2+1];
 				
 				java.io.FileOutputStream out=new java.io.FileOutputStream(file_p_epigenomic_indel);
 				BufferedWriter output= new BufferedWriter(new java.io.OutputStreamWriter(ZipFilter.filterOutputStream(out, file_p_epigenomic_indel)));
@@ -3000,6 +3129,10 @@ public class CombinedStatistics_100 {
 				
 			}
 			else{
+				count_epigenomic_indel1 = read_count_dump(file_count_epigenomic_indel1, 100000, 3);
+				count_epigenomic_indel2 = read_count_dump(file_count_epigenomic_indel2, 10000, 3);
+				count_epigenomic_indel3 = read_count_dump(file_count_epigenomic_indel3, 1000, 3);
+
 				sign_epigenomic_indel=new double[chr.length][][];
 				for (int i=0;i<chr.length;i++){
 					sign_epigenomic_indel[i]=new double[1+(chr_length[i]-shift_mut)/100000][3];
@@ -3014,6 +3147,11 @@ public class CombinedStatistics_100 {
 					sign_epigenomic_indel[Integer.parseInt(t[0])][Integer.parseInt(t[1])][2]=Double.parseDouble(t[4]);
 				}
 				input.close();
+			}
+			{
+				mask_counts(p_mask, count_epigenomic_indel1, "sign_epigenomic_indel_large", 100000);
+				mask_counts(p_mask, count_epigenomic_indel2, "sign_epigenomic_indel_min_10fold", 10000);
+				mask_counts(p_mask, count_epigenomic_indel3, "sign_epigenomic_indel_min_100fold", 1000);
 			}
 			}
 
@@ -3260,7 +3398,7 @@ public class CombinedStatistics_100 {
 			for (int i=0;i<chr.length;i++){
 				for (int j=0;j<1+(chr_length[i]-shift_mut)/100000;j++){
 					if(coverage_valid[i][j]){
-						output.write(chr[i]+"	"+(j*100000+shift_mut)+"	"+p_splice[i][j]+"	"+p_clumps_combi[i][j]+"	"+p_clumps_combi_indel[i][j]+"	"+p_indel[i][j][0]+"	"+p_indel[i][j][1]+"	"+p_indel[i][j][2]+"	"+p_combi[i][j][0]+"	"+p_combi[i][j][1]+"	"+p_combi[i][j][2]+"	"+sign_epigenomic_combi[i][j][0]+"	"+sign_epigenomic_combi[i][j][1]+"	"+sign_epigenomic_combi[i][j][2]+"	"+sign_epigenomic_indel[i][j][0]+"	"+sign_epigenomic_indel[i][j][1]+"	"+sign_epigenomic_indel[i][j][2]+"	"+p_hotspot[i][j]+"	"+p_destructive[i][j]);
+						output.write(chr[i]+"	"+(j*100000+shift_mut)+"	"+format_p_mask(p_splice[i][j], p_mask[i][j][0])+"	"+format_p_mask(p_clumps_combi[i][j], p_mask[i][j][1])+"	"+format_p_mask(p_clumps_combi_indel[i][j], p_mask[i][j][2])+"	"+format_p_mask(p_indel[i][j][0], p_mask[i][j][3])+"	"+format_p_mask(p_indel[i][j][1], p_mask[i][j][4])+"	"+format_p_mask(p_indel[i][j][2], p_mask[i][j][5])+"	"+format_p_mask(p_combi[i][j][0], p_mask[i][j][6])+"	"+format_p_mask(p_combi[i][j][1], p_mask[i][j][7])+"	"+format_p_mask(p_combi[i][j][2], p_mask[i][j][8])+"	"+format_p_mask(sign_epigenomic_combi[i][j][0], p_mask[i][j][9])+"	"+format_p_mask(sign_epigenomic_combi[i][j][1], p_mask[i][j][10])+"	"+format_p_mask(sign_epigenomic_combi[i][j][2], p_mask[i][j][11])+"	"+format_p_mask(sign_epigenomic_indel[i][j][0], p_mask[i][j][12])+"	"+format_p_mask(sign_epigenomic_indel[i][j][1], p_mask[i][j][13])+"	"+format_p_mask(sign_epigenomic_indel[i][j][2], p_mask[i][j][14])+"	"+format_p_mask(p_hotspot[i][j], p_mask[i][j][15])+"	"+format_p_mask(p_destructive[i][j], p_mask[i][j][16]));
 						output.newLine();
 					}
 				}

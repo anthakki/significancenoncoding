@@ -39,6 +39,7 @@ public class SignificanceNoncoding {
 	static String separator="/";
 	static String out_suffix="";
 	static ArrayList<java.util.regex.Pattern> disabled_tests=new ArrayList<java.util.regex.Pattern>();
+	static int do_mutationfiles = 0;
 	static int do_significance = 0;   // NB. <1 ~ no, 0 ~ automatic, >1 ~ yes
 	static int do_combine = 0;
 
@@ -73,6 +74,12 @@ public class SignificanceNoncoding {
 				}
 				else if(args[i].equals("-disable_test")){
 					disabled_tests.add(globPattern(args[++i]));
+				}
+				else if(args[i].equals("-no_mutationfiles")) {
+					do_mutationfiles=-1;
+				}
+				else if(args[i].equals("-always_mutationfiles")) {
+					do_mutationfiles=+1;
 				}
 				else if(args[i].equals("-no_significance")){
 					do_significance=-1;
@@ -179,7 +186,11 @@ public class SignificanceNoncoding {
 
 			String [] all_entities=to_array(entities);
 
-			boolean input_done = true;
+			if (do_mutationfiles >= 0) {
+				boolean input_done = false;
+
+			if (do_mutationfiles == 0) {
+				input_done = true;
 			for (int i=0;i<files.size();i++){
 				for (int ii=0;ii<chr.length;ii++){
 					files_mut_snv[i][ii][0]=folder_auxiliary+"MutationFiles"+separator+"Mutations_Chr"+chr[ii]+"_"+entities.get(i)+"_SNV.txt"+out_suffix;
@@ -192,9 +203,11 @@ public class SignificanceNoncoding {
 				files_donors[i][0]=folder_auxiliary+"MutationFiles"+separator+"Donors_"+entities.get(i)+".txt"+out_suffix;
 				input_done = input_done && new java.io.File(files_donors[i][0]).exists();
 			}
+			}
 
 			System.out.println("A");
 			if (input_done) {
+				if (do_mutationfiles == 0)
 				System.out.println("[<< reusing previous MutationFiles>>]");
 			}
 			else {
@@ -274,6 +287,8 @@ public class SignificanceNoncoding {
 			}
 			} // !input_done
 			System.out.println("A");
+
+			}
 			
 			{
 				long seeds[] = Random_nextLongs(rng, 4);

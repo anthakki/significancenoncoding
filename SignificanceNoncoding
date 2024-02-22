@@ -22,7 +22,7 @@ while [ $# -gt 0 ]; do
 			opts+=("$1" "$2")
 			shift
 			;;
-		-no_significance|-always_significance|-no_combine|-always_combine)
+		-no_mutationfiles|-always_mutationfiles|-no_significance|-always_significance|-no_combine|-always_combine)
 			opts+=("$1")
 			;;
 		-k)

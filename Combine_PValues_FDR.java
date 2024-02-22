@@ -1374,6 +1374,13 @@ public class Combine_PValues_FDR {
 		}
 		return -1;
 	}
+
+	private static boolean parse_mask_and_double(double[][][] sign, boolean[][][] p_mask, int i, int j, int k, String v) {
+		boolean flag = v.charAt(0) == '+';
+		sign[i][j][k] = Double.parseDouble(v);
+		p_mask[i][j][k] = !flag;
+		return flag;
+	}
 	
 	//combined significance values of 10kb intervals to one combined significance value per interval using Brown's method
 	public static double[][] read_sign(String entity, int shift) throws java.io.IOException {
@@ -1417,43 +1424,25 @@ public class Combine_PValues_FDR {
 					1000,//sign_epigenomic_combi_min
 			};
 			
-			double[][][] count=new double[threshold_count.length][][];
-			for (int k=0;k<files_count.length;k++){
-				if(files_count_dim[k]==1000){
-					count[k]=read_count_1000(files_count[k],shift);
-				}
-				else if(files_count_dim[k]==10000){
-					count[k]=read_count_10000(files_count[k],shift);
-				}
-			}
-			
-					
 			double[][][] sign=new double[chr.length][][];
-			double[][][] clumps=new double[chr.length][][];
-			double[][][] clumps_avg=new double[chr.length][][];
 			for (int i=0;i<chr.length;i++){
 				sign[i]=new double[1+(chr_length[i]-shift)/10000][13];
-				clumps[i]=new double[1+(chr_length[i]-shift)/10000][2];
-				clumps_avg[i]=new double[1+(chr_length[i]-shift)/10000][2];
 				for (int j=0;j<sign[i].length;j++){
 					for (int k=0;k<sign[i][j].length;k++){
 						sign[i][j][k]=1.0;
 					}
 				}
 			}
+
+			boolean has_mask = false;
+			boolean[][][] p_mask = new boolean[chr.length][][];
+			for (int i = 0; i < chr.length; ++i)
+				p_mask[i] = new boolean[1+(chr_length[i]-shift)/10000][13];
+
+			// NOTE: p_mask only well defined where sign != 1.
+			 // as the trivial rows are not written in Significance_*
 			
-			for (int k=0;k<files_clumps.length;k++){
-				FileInputStream in=new FileInputStream(files_clumps[k]);
-				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
-				String s="";
-				while((s=input.readLine())!=null){
-					String[] t=s.split("	");
-					clumps[Integer.parseInt(t[0])][Integer.parseInt(t[1])][k]=Double.parseDouble(t[2]);
-					clumps_avg[Integer.parseInt(t[0])][Integer.parseInt(t[1])][k]=Double.parseDouble(t[3]);
-				}
-				input.close();
-			}
-			
+			{
 			FileInputStream in=new FileInputStream(folder_significance+"Significance_"+entity+"_"+shift+".txt"+SignificanceNoncoding.out_suffix);
 			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String[] t_head = input.readLine().split("\t");
@@ -1474,10 +1463,73 @@ public class Combine_PValues_FDR {
 					if(index(t[0],chr)==-1){
 						System.out.println(t[0]);
 					}
-					sign[index(t[0],chr)][(Integer.parseInt(t[1])-shift)/10000][k]=Double.parseDouble(t[k+2]);
+					has_mask |= parse_mask_and_double( sign, p_mask, index(t[0],chr), (Integer.parseInt(t[1])-shift)/10000, k, t[k+2] );
 				}
 			}
 			input.close();
+			}
+
+			if (!has_mask) {
+			
+			double[][][] count=new double[threshold_count.length][][];
+			for (int k=0;k<files_count.length;k++){
+				if(files_count_dim[k]==1000){
+					count[k]=read_count_1000(files_count[k],shift);
+				}
+				else if(files_count_dim[k]==10000){
+					count[k]=read_count_10000(files_count[k],shift);
+				}
+			}
+
+			double[][][] clumps=new double[chr.length][][];
+			double[][][] clumps_avg=new double[chr.length][][];
+			for (int i=0;i<chr.length;i++){
+				clumps[i]=new double[1+(chr_length[i]-shift)/10000][2];
+				clumps_avg[i]=new double[1+(chr_length[i]-shift)/10000][2];
+			}
+			
+			for (int k=0;k<files_clumps.length;k++){
+				FileInputStream in=new FileInputStream(files_clumps[k]);
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
+				String s="";
+				while((s=input.readLine())!=null){
+					String[] t=s.split("	");
+					clumps[Integer.parseInt(t[0])][Integer.parseInt(t[1])][k]=Double.parseDouble(t[2]);
+					clumps_avg[Integer.parseInt(t[0])][Integer.parseInt(t[1])][k]=Double.parseDouble(t[3]);
+				}
+				input.close();
+			}
+
+			if (has_mask)   // NB. must be set to false if used !!!
+				for (int i = 0; i < p_mask.length; ++i)
+					for (int j = 0; j < p_mask[i].length; ++j)
+						for (int k = 0; k < p_mask[i][j].length; ++k)
+							p_mask[i][j][k] = false;
+			
+			for (int i=0;i<sign.length;i++){
+				for (int j=0;j<sign[i].length;j++){
+					for (int k=0;k<clumps_avg[i][j].length;k++){
+						if(clumps[i][j][k]>2.5*clumps_avg[i][j][k]&&clumps_avg[i][j][k]>1){
+							
+						}
+						else{
+							p_mask[i][j][k+1]=true;
+						}
+					}
+					
+					for (int k=0;k<threshold_count.length;k++){
+						if(count[k][i][j]>threshold_count[k]){
+							
+						}
+						else{
+							p_mask[i][j][k+3]=true;
+						}
+					}
+					
+				}
+			}
+			
+			} // if (!has_mask)
 	
 			double aavg, var, aavgX, varX;
 			{
@@ -1517,32 +1569,12 @@ public class Combine_PValues_FDR {
 			
 			double ccX=varX/(2*aavgX);
 			double kkX=2*aavgX*aavgX/varX;
-			
-			for (int i=0;i<sign.length;i++){
-				for (int j=0;j<sign[i].length;j++){
-					for (int k=0;k<clumps_avg[i][j].length;k++){
-						if(clumps[i][j][k]>2.5*clumps_avg[i][j][k]&&clumps_avg[i][j][k]>1){
-							
-						}
-						else{
-							sign[i][j][k+1]=1;//Math.random();
-							//fdr[i][j][k+2]=1;
-						}
-					}
-					
-					for (int k=0;k<threshold_count.length;k++){
-						if(count[k][i][j]>threshold_count[k]){
-							
-						}
-						else{
-							sign[i][j][k+3]=1;
-						}
-					}
-					
-				}
-			}
-			
-			
+
+			for (int i = 0; i < sign.length; ++i)
+				for (int j = 0; j < sign[i].length; ++j)
+					for (int k = 0; k < sign[i][j].length; ++k)
+						if (p_mask[i][j][k])
+							sign[i][j][k] = 1.0;
 			
 			ChiSquaredDistribution dist=new ChiSquaredDistribution(kk);
 			ChiSquaredDistribution distX=new ChiSquaredDistribution(kkX);
@@ -1743,47 +1775,25 @@ public class Combine_PValues_FDR {
 					1,//sign_epigenomic_indel_100fold	
 			};
 			
-			
-			
-			double[][][] count_100=new double[threshold_count_100.length][][];
-			for (int k=0;k<files_count_100.length;k++){
-				if(files_count_100_dim[k]==1000){
-					count_100[k]=read_100_count_1000(files_count_100[k],shift);
-				}
-				else if(files_count_100_dim[k]==10000){
-					count_100[k]=read_100_count_10000(files_count_100[k],shift);
-				}
-				else if(files_count_100_dim[k]==100000){
-					count_100[k]=read_100_count_100000(files_count_100[k],shift);
-				}
-			}
-			
 			double[][][] sign=new double[chr.length][][];
-			double[][][] clumps=new double[chr.length][][];
-			double[][][] clumps_avg=new double[chr.length][][];
 			for (int i=0;i<chr.length;i++){
 				sign[i]=new double[1+(chr_length[i]-shift)/100000][17];
-				clumps[i]=new double[1+(chr_length[i]-shift)/100000][2];
-				clumps_avg[i]=new double[1+(chr_length[i]-shift)/100000][2];
 				for (int j=0;j<sign[i].length;j++){
 					for (int k=0;k<sign[i][j].length;k++){
 						sign[i][j][k]=1.0;
 					}
 				}
 			}
+
+			boolean has_mask = false;
+			boolean[][][] p_mask = new boolean[chr.length][][];
+			for (int i = 0; i < chr.length; ++i)
+				p_mask[i] = new boolean[1+(chr_length[i]-shift)/100000][17];
+
+			// NOTE: p_mask only well defined where sign != 1.
+			 // as the trivial rows are not written in Significance_*
 			
-			for (int k=0;k<files_clumps.length;k++){
-				FileInputStream in=new FileInputStream(files_clumps[k]);
-				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
-				String s="";
-				while((s=input.readLine())!=null){
-					String[] t=s.split("	");
-					clumps[Integer.parseInt(t[0])][Integer.parseInt(t[1])][k]=Double.parseDouble(t[2]);
-					clumps_avg[Integer.parseInt(t[0])][Integer.parseInt(t[1])][k]=Double.parseDouble(t[3]);
-				}
-				input.close();
-			}
-			
+			{
 			FileInputStream in=new FileInputStream(folder_significance+"Significance_100_"+entity+"_"+shift+".txt"+SignificanceNoncoding.out_suffix);
 			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String[] t_head = input.readLine().split("\t");
@@ -1804,10 +1814,76 @@ public class Combine_PValues_FDR {
 					if(index(t[0],chr)==-1){
 						System.out.println(t[0]);
 					}
-					sign[index(t[0],chr)][(Integer.parseInt(t[1])-shift)/100000][k]=Double.parseDouble(t[k+2]);
+					has_mask |= parse_mask_and_double( sign, p_mask, index(t[0],chr), (Integer.parseInt(t[1])-shift)/100000, k, t[k+2] );
 				}
 			}
 			input.close();
+			}
+
+			if (!has_mask) {
+			
+			double[][][] count_100=new double[threshold_count_100.length][][];
+			for (int k=0;k<files_count_100.length;k++){
+				if(files_count_100_dim[k]==1000){
+					count_100[k]=read_100_count_1000(files_count_100[k],shift);
+				}
+				else if(files_count_100_dim[k]==10000){
+					count_100[k]=read_100_count_10000(files_count_100[k],shift);
+				}
+				else if(files_count_100_dim[k]==100000){
+					count_100[k]=read_100_count_100000(files_count_100[k],shift);
+				}
+			}
+			
+			double[][][] clumps=new double[chr.length][][];
+			double[][][] clumps_avg=new double[chr.length][][];
+			for (int i=0;i<chr.length;i++){
+				clumps[i]=new double[1+(chr_length[i]-shift)/100000][2];
+				clumps_avg[i]=new double[1+(chr_length[i]-shift)/100000][2];
+			}
+
+			for (int k=0;k<files_clumps.length;k++){
+				FileInputStream in=new FileInputStream(files_clumps[k]);
+				BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
+				String s="";
+				while((s=input.readLine())!=null){
+					String[] t=s.split("	");
+					clumps[Integer.parseInt(t[0])][Integer.parseInt(t[1])][k]=Double.parseDouble(t[2]);
+					clumps_avg[Integer.parseInt(t[0])][Integer.parseInt(t[1])][k]=Double.parseDouble(t[3]);
+				}
+				input.close();
+			}
+
+			if (has_mask)   // NB. must be set to false if used !!!
+				for (int i = 0; i < p_mask.length; ++i)
+					for (int j = 0; j < p_mask[i].length; ++j)
+						for (int k = 0; k < p_mask[i][j].length; ++k)
+							p_mask[i][j][k] = false;
+			
+			for (int i=0;i<sign.length;i++){
+				for (int j=0;j<sign[i].length;j++){
+					for (int k=0;k<clumps_avg[i][j].length;k++){
+						if(clumps[i][j][k]>2.5*clumps_avg[i][j][k]&&clumps_avg[i][j][k]>1){
+							
+						}
+						else{
+							p_mask[i][j][k+1]=true;
+						}
+					}
+					
+					for (int k=0;k<threshold_count_100.length;k++){
+						if(count_100[k][i][j]>threshold_count_100[k]){
+							
+						}
+						else{
+							p_mask[i][j][k+3]=true;
+						}
+					}
+					
+				}
+			}
+
+			} // if (!has_mask)
 
 			double aavg, var, aavgX, varX;
 			{
@@ -1847,30 +1923,11 @@ public class Combine_PValues_FDR {
 			double ccX=varX/(2*aavgX);
 			double kkX=2*aavgX*aavgX/varX;
 			
-			
-			for (int i=0;i<sign.length;i++){
-				for (int j=0;j<sign[i].length;j++){
-					for (int k=0;k<clumps_avg[i][j].length;k++){
-						if(clumps[i][j][k]>2.5*clumps_avg[i][j][k]&&clumps_avg[i][j][k]>1){
-							
-						}
-						else{
-							sign[i][j][k+1]=1;//Math.random();
-						}
-					}
-					
-					for (int k=0;k<threshold_count_100.length;k++){
-						if(count_100[k][i][j]>threshold_count_100[k]){
-							
-						}
-						else{
-							sign[i][j][k+3]=1;
-						}
-					}
-					
-				}
-			}
-			
+			for (int i = 0; i < sign.length; ++i)
+				for (int j = 0; j < sign[i].length; ++j)
+					for (int k = 0; k < sign[i][j].length; ++k)
+						if (p_mask[i][j][k])
+							sign[i][j][k] = 1.0;
 			
 			ChiSquaredDistribution dist=new ChiSquaredDistribution(kk);
 			ChiSquaredDistribution distX=new ChiSquaredDistribution(kkX);
