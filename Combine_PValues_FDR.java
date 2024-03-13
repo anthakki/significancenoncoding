@@ -80,81 +80,82 @@ public class Combine_PValues_FDR {
 	
 	//look up the TCGA identifier by cancer type names to associate them with their cancer type specific position
 	public static String[] get_expression_entities(String entity){
+		ArrayList<String> mapped_entities = new ArrayList<String>();
+
+		if(entity.startsWith("Biliary")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"CHOL"}));
+		}
+		if(entity.startsWith("Bladder")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"BLCA"}));
+		}
+		if(entity.startsWith("Brain")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"GBM","GBMLGG","LGG"}));
+		}
+		if(entity.startsWith("Breast")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"BRCA"}));
+		}
+		if(entity.startsWith("Cervix")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"CESC"}));
+		}
+		if(entity.startsWith("Colorectal")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"COAD","COADREAD","READ"}));
+		}
+		if(entity.startsWith("Endocrine")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{}));//"Endocrine"
+		}
+		if(entity.startsWith("Endometrium")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"UCEC"}));
+		}
+		if(entity.startsWith("Esophagus")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"ESCA"}));
+		}
+		if(entity.startsWith("Gastric")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"STAD"}));
+		}
+		if(entity.startsWith("HeadNeck")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"HNSC"}));
+		}
+		if(entity.startsWith("Kidney")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"KICH","KIPAN","KIRC","KIRP"}));
+		}
+		if(entity.startsWith("Leukemia")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"LAML"}));
+		}
+		if(entity.startsWith("Liver")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"LIHC"}));
+		}
+		if(entity.startsWith("Lung")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"LUAD","LUSC"}));
+		}
+		if(entity.startsWith("Lymphoma")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"DLBC"}));
+		}
+		if(entity.startsWith("Myeloid")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{}));//"Myeloid"
+		}
+		if(entity.startsWith("Ovary")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"OV"}));
+		}
+		if(entity.startsWith("Pancreas")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"PAAD"}));
+		}
+		if(entity.startsWith("Pleura")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"MESO"}));
+		}
+		if(entity.startsWith("Prostate")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"PRAD"}));
+		}
+		if(entity.startsWith("Sarcoma")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"SARC"}));
+		}
+		if(entity.startsWith("Skin")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"SKCM"}));
+		}
+		if(entity.startsWith("Thyroid")){
+			mapped_entities.addAll(java.util.Arrays.asList(new String[]{"THCA"}));
+		}
 		
-		if(entity.equals("Biliary")){
-			return new String[]{"CHOL"};
-		}
-		if(entity.equals("Bladder")){
-			return new String[]{"BLCA"};
-		}
-		if(entity.equals("Brain")){
-			return new String[]{"GBM","GBMLGG","LGG"};
-		}
-		if(entity.equals("Breast")){
-			return new String[]{"BRCA"};
-		}
-		if(entity.equals("Cervix")){
-			return new String[]{"CESC"};
-		}
-		if(entity.equals("Colorectal")){
-			return new String[]{"COAD","COADREAD","READ"};
-		}
-		if(entity.equals("Endocrine")){
-			return new String[]{};//"Endocrine"
-		}
-		if(entity.equals("Endometrium")){
-			return new String[]{"UCEC"};
-		}
-		if(entity.equals("Esophagus")){
-			return new String[]{"ESCA"};
-		}
-		if(entity.equals("Gastric")){
-			return new String[]{"STAD"};
-		}
-		if(entity.equals("HeadNeck")){
-			return new String[]{"HNSC"};
-		}
-		if(entity.equals("Kidney")){
-			return new String[]{"KICH","KIPAN","KIRC","KIRP"};
-		}
-		if(entity.equals("Leukemia")){
-			return new String[]{"LAML"};
-		}
-		if(entity.equals("Liver")){
-			return new String[]{"LIHC"};
-		}
-		if(entity.equals("Lung")){
-			return new String[]{"LUAD","LUSC"};
-		}
-		if(entity.equals("Lymphoma")){
-			return new String[]{"DLBC"};
-		}
-		if(entity.equals("Myeloid")){
-			return new String[]{};//"Myeloid"
-		}
-		if(entity.equals("Ovary")){
-			return new String[]{"OV"};
-		}
-		if(entity.equals("Pancreas")){
-			return new String[]{"PAAD"};
-		}
-		if(entity.equals("Pleura")){
-			return new String[]{"MESO"};
-		}
-		if(entity.equals("Prostate")){
-			return new String[]{"PRAD"};
-		}
-		if(entity.equals("Sarcoma")){
-			return new String[]{"SARC"};
-		}
-		if(entity.equals("Skin")){
-			return new String[]{"SKCM"};
-		}
-		if(entity.equals("Thyroid")){
-			return new String[]{"THCA"};
-		}
-		
-		return new String[]{};
+		return mapped_entities.toArray(new String[]{});
 	}
 	
 	//intitiate paths and global variables based on the parameters parsed to the script from outside
