@@ -1424,21 +1424,15 @@ public class Combine_PValues_FDR {
 					10000,//sign_epigenomic_combi_large	
 					1000,//sign_epigenomic_combi_min
 			};
+
+			final int sign_width = 13;   // NB. see product() etc.
+			final int sign_aux_width = 4;
+			int sign_eff_width = sign_width;
 			
 			double[][][] sign=new double[chr.length][][];
-			for (int i=0;i<chr.length;i++){
-				sign[i]=new double[1+(chr_length[i]-shift)/10000][13];
-				for (int j=0;j<sign[i].length;j++){
-					for (int k=0;k<sign[i][j].length;k++){
-						sign[i][j][k]=1.0;
-					}
-				}
-			}
 
 			boolean has_mask = false;
 			boolean[][][] p_mask = new boolean[chr.length][][];
-			for (int i = 0; i < chr.length; ++i)
-				p_mask[i] = new boolean[1+(chr_length[i]-shift)/10000][13];
 
 			// NOTE: p_mask only well defined where sign != 1.
 			 // as the trivial rows are not written in Significance_*
@@ -1447,6 +1441,22 @@ public class Combine_PValues_FDR {
 			FileInputStream in=new FileInputStream(folder_significance+"Significance_"+entity+"_"+shift+".txt"+SignificanceNoncoding.out_suffix);
 			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String[] t_head = input.readLine().split("\t");
+
+			sign_eff_width = t_head.length - 2;
+			if (sign_eff_width % sign_width != 0)
+				throw new java.lang.RuntimeException("invalid significance matrix width");
+
+			for (int i=0;i<chr.length;i++){
+				sign[i]=new double[1+(chr_length[i]-shift)/10000][sign_eff_width];
+				for (int j=0;j<sign[i].length;j++){
+					for (int k=0;k<sign[i][j].length;k++){
+						sign[i][j][k]=1.0;
+					}
+				}
+			}
+			for (int i = 0; i < chr.length; ++i)
+				p_mask[i] = new boolean[1+(chr_length[i]-shift)/10000][sign_eff_width];
+
 			java.util.HashSet<Integer> disabled_inds = new java.util.HashSet<Integer>();
 			for (int k = 2; k < t_head.length; ++k)
 				for (java.util.regex.Pattern pattern : SignificanceNoncoding.disabled_tests)
@@ -1454,13 +1464,14 @@ public class Combine_PValues_FDR {
 						System.err.printf("disable \"%s\" index %d\n", t_head[k], k);
 						break;
 					}
+
 			String s="";
 			while((s=input.readLine())!=null){
 				String[] t=s.split("	");
 				for (int k : disabled_inds)
 					if (k != -1)
 						t[k] = "1.0";
-				for (int k=0;k<13;k++){
+				for (int k=0;k<sign_eff_width;k++){
 					if(index(t[0],chr)==-1){
 						System.out.println(t[0]);
 					}
@@ -1471,6 +1482,9 @@ public class Combine_PValues_FDR {
 			}
 
 			if (!has_mask) {
+
+			if (sign_eff_width != sign_width)
+				throw new java.lang.RuntimeException("invalid significance matrix width");
 			
 			double[][][] count=new double[threshold_count.length][][];
 			for (int k=0;k<files_count.length;k++){
@@ -1534,10 +1548,10 @@ public class Combine_PValues_FDR {
 	
 			double aavg, var, aavgX, varX;
 			{
-				MVNEstimator est = new MVNEstimator( 13+4 );
+				MVNEstimator est = new MVNEstimator( sign_eff_width+sign_eff_width/sign_width*sign_aux_width );
 				double[] x = new double[est.dim()];
 
-				MVNEstimator estX = new MVNEstimator( 13+4 );
+				MVNEstimator estX = new MVNEstimator( sign_eff_width+sign_eff_width/sign_width*sign_aux_width );
 				double[] xX = new double[estX.dim()];
 
 			for (int i=0;i<sign.length;i++){
@@ -1646,10 +1660,12 @@ public class Combine_PValues_FDR {
 		int[] index_sel={0,1,2,3,4,5,6,7,8,9,10,11,12};
 						 
 		double product=1;
+		for (int s = 0; s < x.length; s += index_sel.length) {
 		for (int i=0;i<index_sel.length;i++){
-			product*=x[index_sel[i]];
+			product*=x[s+index_sel[i]];
 		}
-		product*=x[11]*x[1]*x[2]*x[12];
+		product*=x[s+11]*x[s+1]*x[s+2]*x[s+12];
+		}
 		
 		return product;
 	}
@@ -1657,16 +1673,18 @@ public class Combine_PValues_FDR {
 		int t=0;
 
 		double product=1;
+		for (int s = 0; s < x.length; s += index_sel.length) {
 		for (int i=0;i<index_sel.length;i++){
-			x_sel[t++]=x[index_sel[i]];
-			product*=x[index_sel[i]];
+			x_sel[t++]=x[s+index_sel[i]];
+			product*=x[s+index_sel[i]];
 		}
 		double product_aux=1;
 		for (int i=0;i<aux_sel.length;i++){
-			x_sel[t++]=x[aux_sel[i]];
-			product_aux*=x[aux_sel[i]];
+			x_sel[t++]=x[s+aux_sel[i]];
+			product_aux*=x[s+aux_sel[i]];
 		}
 		product*=product_aux;
+		}
 
 		return product;
 	}
@@ -1679,10 +1697,12 @@ public class Combine_PValues_FDR {
 		int[] index_sel={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
 			
 		double product=1;
+		for (int s = 0; s < x.length; s += index_sel.length) {
 		for (int i=0;i<index_sel.length;i++){
 			product*=x[index_sel[i]];
 		}
 		product*=x[15]*x[1]*x[2]*x[16];
+		}
 		return product;
 	}
 	public static double product100Values(double[] x_sel, double x[]){
@@ -1694,10 +1714,12 @@ public class Combine_PValues_FDR {
 		int[] index_sel={0,1,2,3,4,5,6,7,8,9,10,11,12};
 		
 		double product=1;
+		for (int s = 0; s < x.length; s += index_sel.length) {
 		for (int i=0;i<index_sel.length;i++){
 			product*=x[index_sel[i]];
 		}
 		product*=x[11]*x[1]*x[2]*x[12];
+		}
 		return product;
 	}
 	public static double productXValues(double[] x_sel, double[] x) {
@@ -1709,10 +1731,12 @@ public class Combine_PValues_FDR {
 		int[] index_sel={0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
 						 
 		double product=1;
+		for (int s = 0; s < x.length; s += index_sel.length) {
 		for (int i=0;i<index_sel.length;i++){
 			product*=x[index_sel[i]];
 		}
 		product*=x[15]*x[1]*x[2]*x[16];
+		}
 		return product;
 	}
 	public static double product100XValues(double[] x_sel, double[] x) {
@@ -1775,21 +1799,15 @@ public class Combine_PValues_FDR {
 					1,//sign_epigenomic_indel_10fold	
 					1,//sign_epigenomic_indel_100fold	
 			};
+
+			final int sign_width = 17;
+			final int sign_aux_width = 4;
+			int sign_eff_width = sign_width;
 			
 			double[][][] sign=new double[chr.length][][];
-			for (int i=0;i<chr.length;i++){
-				sign[i]=new double[1+(chr_length[i]-shift)/100000][17];
-				for (int j=0;j<sign[i].length;j++){
-					for (int k=0;k<sign[i][j].length;k++){
-						sign[i][j][k]=1.0;
-					}
-				}
-			}
 
 			boolean has_mask = false;
 			boolean[][][] p_mask = new boolean[chr.length][][];
-			for (int i = 0; i < chr.length; ++i)
-				p_mask[i] = new boolean[1+(chr_length[i]-shift)/100000][17];
 
 			// NOTE: p_mask only well defined where sign != 1.
 			 // as the trivial rows are not written in Significance_*
@@ -1798,6 +1816,22 @@ public class Combine_PValues_FDR {
 			FileInputStream in=new FileInputStream(folder_significance+"Significance_100_"+entity+"_"+shift+".txt"+SignificanceNoncoding.out_suffix);
 			BufferedReader input= new BufferedReader(new InputStreamReader(ZipFilter.filterInputStream(in)));
 			String[] t_head = input.readLine().split("\t");
+
+			sign_eff_width = t_head.length - 2;
+			if (sign_eff_width % sign_width != 0)
+				throw new java.lang.RuntimeException("invalid significance matrix width");
+
+			for (int i=0;i<chr.length;i++){
+				sign[i]=new double[1+(chr_length[i]-shift)/100000][sign_eff_width];
+				for (int j=0;j<sign[i].length;j++){
+					for (int k=0;k<sign[i][j].length;k++){
+						sign[i][j][k]=1.0;
+					}
+				}
+			}
+			for (int i = 0; i < chr.length; ++i)
+				p_mask[i] = new boolean[1+(chr_length[i]-shift)/100000][sign_eff_width];
+
 			java.util.HashSet<Integer> disabled_inds = new java.util.HashSet<Integer>();
 			for (int k = 2; k < t_head.length; ++k)
 				for (java.util.regex.Pattern pattern : SignificanceNoncoding.disabled_tests)
@@ -1805,13 +1839,14 @@ public class Combine_PValues_FDR {
 						System.err.printf("disable \"%s\" index %d\n", t_head[k], k);
 						break;
 					}
+
 			String s="";
 			while((s=input.readLine())!=null){
 				String[] t=s.split("	");
 				for (int k : disabled_inds)
 					if (k != -1)
 						t[k] = "1.0";
-				for (int k=0;k<17;k++){
+				for (int k=0;k<sign_eff_width;k++){
 					if(index(t[0],chr)==-1){
 						System.out.println(t[0]);
 					}
@@ -1822,6 +1857,9 @@ public class Combine_PValues_FDR {
 			}
 
 			if (!has_mask) {
+
+			if (sign_eff_width != sign_width)
+				throw new java.lang.RuntimeException("invalid significance matrix width");
 			
 			double[][][] count_100=new double[threshold_count_100.length][][];
 			for (int k=0;k<files_count_100.length;k++){
@@ -1888,10 +1926,10 @@ public class Combine_PValues_FDR {
 
 			double aavg, var, aavgX, varX;
 			{
-				MVNEstimator est = new MVNEstimator( 17+4 );
+				MVNEstimator est = new MVNEstimator( sign_eff_width+sign_eff_width/sign_width*sign_aux_width );
 				double[] x = new double[est.dim()];
 
-				MVNEstimator estX = new MVNEstimator( 17+4 );
+				MVNEstimator estX = new MVNEstimator( sign_eff_width+sign_eff_width/sign_width*sign_aux_width );
 				double[] xX = new double[estX.dim()];
 			
 			for (int i=0;i<sign.length;i++){
