@@ -564,7 +564,7 @@ public class Combine_PValues_FDR {
 		
 		for (int i=0;i<gene_borders.size();i++){
 			for (int j=(gene_borders.get(i)[1]-shift)/width;j<=(gene_borders.get(i)[2]-shift)/width;j++){
-				index_gene[gene_borders.get(i)[0]][j].add(i);
+				index_gene[gene_borders.get(i)[0]][j].add( gene_borders.get(i)[3] );
 			}
 		}
 		return index_gene;
@@ -638,22 +638,13 @@ public class Combine_PValues_FDR {
 					String c=t[2].substring(3);
 					String gene_name=symbol(t[12]);
 					
-					if(search_table2.get(gene_name.toUpperCase())==null){
-						search_table2.put(gene_name.toUpperCase(),gene_names.size());
+					Integer ii=search_table2.get(gene_name.toUpperCase());
+					if(ii==null){
+						ii=gene_names.size();
+						search_table2.put(gene_name.toUpperCase(),ii);
 						gene_names.add(gene_name.toUpperCase());
-						gene_borders.add(new int[]{index(c,chr),Integer.parseInt(t[4])+1,Integer.parseInt(t[5])});
 					}
-					else{
-						Integer ii=search_table2.get(gene_name.toUpperCase());
-						if(gene_borders.get(ii)[0]==index(c,chr)){
-							if(Integer.parseInt(t[4])+1<gene_borders.get(ii)[1]){
-								gene_borders.get(ii)[1]=Integer.parseInt(t[4])+1;
-							}
-							if(Integer.parseInt(t[5])>gene_borders.get(ii)[2]){
-								gene_borders.get(ii)[2]=Integer.parseInt(t[5]);
-							}
-						}
-					}
+					gene_borders.add(new int[]{index(c,chr),Integer.parseInt(t[4])+1,Integer.parseInt(t[5]),ii});
 					
 				}
 				input.close();
