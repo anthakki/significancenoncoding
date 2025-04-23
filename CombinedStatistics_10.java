@@ -1645,6 +1645,17 @@ public class CombinedStatistics_10 {
 		assert !( p_value < 0. && !mask );   // NB. not decodable
 		return ( !mask && !( p_value < 0. ) ? "+" : "" ) + p_value;
 	}
+
+	// just set up the paths and preprocess data, so we can run each entity independently afterwards
+	public static void execute_read_mutations_all_entities(int shift_mut, String folder_auxiliary, String folder_significance,String folder_annotation,String folder_counts_all, String[] all_entities, String[][] files_donors, String[][][] files_mut_snv, String[][][] files_mut_indel) throws java.io.IOException {
+
+		initiate( null,  shift_mut,  folder_auxiliary,  folder_significance, folder_annotation, folder_counts_all,  all_entities,files_donors, files_mut_snv, files_mut_indel);
+
+		{
+			coverage=read_coverage();
+			read_mutations_entitites(all_entities);
+		}
+	}
 	
 	//main function called from outside to execute the script. the script first initializes the 
 	//paths and global parameters based on outside parameters. it then reads mutations and annotation data
