@@ -1,9 +1,12 @@
 
 JAR = jar
 JAVAC = javac
+CURL = curl
 RM = rm -f
 
 name = SignificanceNoncoding
+
+goog_url = https://storage.googleapis.com/noncoding_analysishg19
 
 sources := $(wildcard *.java)
 
@@ -18,6 +21,9 @@ cleanobj:
 
 clean: cleanobj
 	$(RM) $(name).jar
+
+AnnotationFilesComplete.zip:
+	$(CURL) -L -o $@ $(goog_url)/$(@F)
 
 manifest.txt:
 	( echo "Main-Class: $(name)" && \
